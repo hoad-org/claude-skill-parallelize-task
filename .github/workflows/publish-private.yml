@@ -72,7 +72,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git clone https://${{ secrets.GITHUB_TOKEN }}@github.com/hoad-org/python-packages-private.git /tmp/python-packages-private
+          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/hoad-org/python-packages-private.git /tmp/python-packages-private
           cd /tmp/python-packages-private
 
           mkdir -p packages/${{ steps.version.outputs.package_name }}
@@ -102,7 +102,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git clone https://${{ secrets.GITHUB_TOKEN }}@github.com/hoad-org/python-packages.git /tmp/python-packages
+          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/hoad-org/python-packages.git /tmp/python-packages
           cd /tmp/python-packages
 
           mkdir -p packages/${{ steps.version.outputs.package_name }}
