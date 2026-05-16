@@ -1,14 +1,14 @@
 """Main orchestrator for task optimization."""
 
 from typing import Dict, List, Any, Optional
-from orchestration_skill.models import (
+from parallelizer_skill.models import (
     Task,
     TaskDependency,
     ExecutionPlan,
     TaskPriority,
 )
-from orchestration_skill.execution_planner import ExecutionPlanner
-from orchestration_skill.dag_analyzer import DAGAnalyzer
+from parallelizer_skill.execution_planner import ExecutionPlanner
+from parallelizer_skill.dag_analyzer import DAGAnalyzer
 
 
 class TaskOrchestrator:

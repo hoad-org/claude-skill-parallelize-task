@@ -1,0 +1,15 @@
+README.md
+pyproject.toml
+claude_skill_parallelize_task.egg-info/PKG-INFO
+claude_skill_parallelize_task.egg-info/SOURCES.txt
+claude_skill_parallelize_task.egg-info/dependency_links.txt
+claude_skill_parallelize_task.egg-info/requires.txt
+claude_skill_parallelize_task.egg-info/top_level.txt
+src/parallelizer_skill/__init__.py
+src/parallelizer_skill/dag_analyzer.py
+src/parallelizer_skill/execution_planner.py
+src/parallelizer_skill/models.py
+src/parallelizer_skill/optimizer.py
+tests/conftest.py
+tests/test_dag_analyzer.py
+tests/test_optimizer.py

@@ -3,7 +3,7 @@
 from typing import Dict, List, Set, Tuple
 import networkx as nx
 
-from orchestration_skill.models import Task, TaskDependency, DependencyType
+from parallelizer_skill.models import Task, TaskDependency, DependencyType
 
 
 class DAGAnalyzer:

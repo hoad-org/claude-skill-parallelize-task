@@ -1,0 +1,276 @@
+Metadata-Version: 2.4
+Name: claude-skill-parallelize-task
+Version: 1.0.0
+Summary: Claude skill for intelligent task parallelization, dependency analysis, and agentic workflow optimization
+Author-email: Claude Code <claude@anthropic.com>
+License: MIT
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: pydantic>=2.5.0
+Requires-Dist: networkx>=3.2
+Requires-Dist: dataclasses-json>=0.6.0
+Requires-Dist: pyyaml>=6.0.0
+Requires-Dist: rich>=14.0.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=6.0.0; extra == "dev"
+Requires-Dist: pytest-mock>=3.12.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.23.0; extra == "dev"
+Requires-Dist: ruff>=0.15.0; extra == "dev"
+Requires-Dist: black>=26.3.0; extra == "dev"
+Requires-Dist: mypy>=1.8.0; extra == "dev"
+Requires-Dist: bandit>=1.9.0; extra == "dev"
+Requires-Dist: pip-audit>=2.10.0; extra == "dev"
+
+# Task Orchestration Skill
+
+Enterprise-grade task orchestration and parallel process optimization for Claude. Analyzes complex task dependencies, identifies optimal parallelization strategies, and generates execution plans for agentic workflows.
+
+## Features
+
+- **Dependency Analysis** — Detects cycles, identifies critical paths, maps task relationships
+- **Parallelization** — Automatically identifies parallelizable task groups and resource constraints
+- **Optimization** — Generates optimal execution plans with calculated speedup metrics
+- **Safety Validation** — Checks for circular dependencies, resource conflicts, and bottlenecks
+- **DAG Analysis** — Full directed acyclic graph analysis using NetworkX
+
+## Installation
+
+### Private Index (Recommended)
+```bash
+export GITHUB_TOKEN=your_github_token
+pip install --index-url https://__token__:${GITHUB_TOKEN}@github.com/hoad-org/python-packages-private/simple/ claude-skill-parallelize-task==1.0.0
+```
+
+### Public Index
+```bash
+pip install --index-url https://hoad-org.github.io/python-packages claude-skill-parallelize-task==1.0.0
+```
+
+### From Source
+```bash
+git clone https://github.com/hoad-org/claude-skill-parallelize-task.git
+cd claude-skill-parallelize-task
+pip install -e .
+```
+
+## Quick Start
+
+```python
+from parallelizer_skill import TaskOrchestrator
+
+# Create orchestrator
+orch = TaskOrchestrator()
+
+# Add tasks
+orch.add_task("task1", "Data Load", estimated_duration=2.0)
+orch.add_task("task2", "Process A", estimated_duration=3.0)
+orch.add_task("task3", "Process B", estimated_duration=3.0)
+orch.add_task("task4", "Aggregate", estimated_duration=1.0)
+
+# Add dependencies
+orch.add_dependency("task1", "task2")  # task2 depends on task1
+orch.add_dependency("task1", "task3")  # task3 depends on task1
+orch.add_dependency("task2", "task4")  # task4 depends on task2
+orch.add_dependency("task3", "task4")  # task4 depends on task3
+
+# Generate optimal execution plan
+plan = orch.optimize()
+
+print(f"Serial duration: {plan.serial_duration}s")
+print(f"Parallel duration: {plan.parallel_duration}s")
+print(f"Speedup: {plan.serial_duration / plan.parallel_duration:.1f}x")
+print(f"Efficiency gain: {plan.efficiency_gain:.1f}%")
+
+# Analyze workflow
+analysis = orch.analyze()
+print(f"Critical path: {' -> '.join(analysis['critical_path'])}")
+print(f"Bottlenecks: {', '.join(analysis['bottlenecks'])}")
+
+# Validate for issues
+validation = orch.validate()
+if not validation["is_valid"]:
+    print(f"Issues: {validation['issues']}")
+```
+
+## Core Concepts
+
+### Task
+A unit of work with:
+- Estimated duration
+- Parallelization capability
+- Resource requirements
+- Priority level
+
+### Dependency
+Relationship between tasks:
+- **Hard** — Must complete before dependent starts
+- **Soft** — Preferred but not required
+- **Data** — Output feeds into input
+
+### Execution Plan
+Optimal scheduling with:
+- Phases of parallel execution
+- Synchronization points
+- Critical path identification
+- Resource conflict detection
+- Speedup metrics
+
+## API Reference
+
+### TaskOrchestrator
+
+```python
+# Add a task
+orch.add_task(
+    task_id="task1",
+    name="Task Name",
+    estimated_duration=1.0,
+    parallelizable=True,
+    priority=TaskPriority.NORMAL,
+    resource_type=None,
+    max_concurrent=1
+)
+
+# Add dependency
+orch.add_dependency("task1", "task2", dependency_type="hard")
+
+# Generate execution plan
+plan = orch.optimize()
+
+# Analyze workflow
+analysis = orch.analyze()
+
+# Get task information
+info = orch.get_task_info("task1")
+
+# Validate workflow
+validation = orch.validate()
+```
+
+### ExecutionPlan
+
+```python
+plan = orch.optimize()
+
+# Access plan components
+plan.total_tasks              # Total number of tasks
+plan.serial_duration          # Time if all tasks run sequentially
+plan.parallel_duration        # Time with optimal parallelization
+plan.efficiency_gain          # Percentage improvement (0-100)
+plan.phases                   # List of execution phases
+plan.critical_path            # Task IDs on critical path
+plan.parallelizable_groups    # Groups that can run in parallel
+plan.resource_conflicts       # Detected resource conflicts
+plan.safety_issues            # Validation issues
+```
+
+## Examples
+
+### Parallel Data Processing
+
+```python
+orch = TaskOrchestrator()
+
+# Data processing pipeline
+orch.add_task("load", "Load Data", 2.0)
+orch.add_task("clean_a", "Clean Stream A", 3.0)
+orch.add_task("clean_b", "Clean Stream B", 3.0)
+orch.add_task("merge", "Merge Results", 1.0)
+
+orch.add_dependency("load", "clean_a")
+orch.add_dependency("load", "clean_b")
+orch.add_dependency("clean_a", "merge")
+orch.add_dependency("clean_b", "merge")
+
+plan = orch.optimize()
+# Serial: 9s → Parallel: 6s (1.5x speedup)
+```
+
+### Resource Constrained Tasks
+
+```python
+orch = TaskOrchestrator()
+
+# API calls with rate limiting
+for i in range(5):
+    orch.add_task(
+        f"api_call_{i}",
+        f"Call API {i}",
+        estimated_duration=1.0,
+        resource_type="api",
+        max_concurrent=2
+    )
+
+plan = orch.optimize()
+# Detects resource constraint and creates batching phases
+```
+
+### Complex Workflow with Bottlenecks
+
+```python
+orch = TaskOrchestrator()
+
+# Many-to-one bottleneck
+for i in range(10):
+    orch.add_task(f"worker_{i}", f"Worker {i}", 1.0)
+
+orch.add_task("aggregator", "Aggregator", 2.0)
+
+for i in range(10):
+    orch.add_dependency(f"worker_{i}", "aggregator")
+
+analysis = orch.analyze()
+# Identifies 'aggregator' as critical bottleneck
+```
+
+## Testing
+
+```bash
+# Run all tests
+pytest
+
+# With coverage
+pytest --cov=src/parallelizer_skill --cov-report=html
+
+# Specific test types
+pytest -m unit          # Unit tests
+pytest -m dag           # DAG analysis tests
+pytest -m optimization  # Optimization tests
+```
+
+## Architecture
+
+```
+src/parallelizer_skill/
+├── __init__.py           # Main exports
+├── models.py             # Task, Dependency, ExecutionPlan models
+├── dag_analyzer.py       # DAG analysis using NetworkX
+├── execution_planner.py  # Execution plan generation
+└── optimizer.py          # Main TaskOrchestrator class
+
+tests/
+├── test_dag_analyzer.py      # DAG analysis tests
+├── test_optimizer.py          # Optimizer tests
+└── conftest.py               # Pytest configuration
+```
+
+## Performance
+
+- **Analysis**: O(V + E) for V tasks and E dependencies
+- **Planning**: O(V²) for worst-case topological sort
+- **Scalability**: Tested with 1000+ task workflows
+
+## Requirements
+
+- Python 3.12+
+- NetworkX 3.2+
+- Pydantic 2.5+
+
+## License
+
+MIT
+
+## Support
+
+For issues and feature requests: https://github.com/hoad-org/claude-skill-parallelize-task/issues

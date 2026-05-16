@@ -1,14 +1,14 @@
 """Creates optimal execution plans for task workflows."""
 
 from typing import Dict, List, Set
-from orchestration_skill.models import (
+from parallelizer_skill.models import (
     Task,
     TaskDependency,
     ExecutionPlan,
     ExecutionPhase,
     TaskGroup,
 )
-from orchestration_skill.dag_analyzer import DAGAnalyzer
+from parallelizer_skill.dag_analyzer import DAGAnalyzer
 
 
 class ExecutionPlanner:
