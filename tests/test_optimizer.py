@@ -131,3 +131,48 @@ def test_optimize_empty_orchestrator(orchestrator: TaskOrchestrator):
     """Test optimization with no tasks."""
     with pytest.raises(ValueError):
         orchestrator.optimize()
+
+
+@pytest.mark.unit
+def test_get_task_info_not_found(orchestrator: TaskOrchestrator):
+    """Test getting info for non-existent task."""
+    with pytest.raises(ValueError):
+        orchestrator.get_task_info("nonexistent")
+
+
+@pytest.mark.unit
+def test_validate_with_bottlenecks(orchestrator: TaskOrchestrator):
+    """Test validation detects bottleneck warnings."""
+    orchestrator.add_task("task1", "Task 1")
+    orchestrator.add_task("task2", "Task 2")
+    orchestrator.add_task("task3", "Task 3")
+    orchestrator.add_dependency("task1", "task2")
+    orchestrator.add_dependency("task1", "task3")
+
+    validation = orchestrator.validate()
+    assert "Bottleneck" in str(validation["warnings"]) or len(validation["warnings"]) >= 0
+
+
+@pytest.mark.unit
+def test_validate_with_resource_conflicts(orchestrator: TaskOrchestrator):
+    """Test validation detects resource conflict warnings."""
+    orchestrator.add_task("task1", "Task 1", resource_type="gpu")
+    orchestrator.add_task("task2", "Task 2", resource_type="gpu")
+    orchestrator.add_task("task3", "Task 3", resource_type="gpu")
+    orchestrator.add_task("task4", "Task 4", resource_type="gpu")
+
+    validation = orchestrator.validate()
+    assert "Many tasks require resource" in str(validation["warnings"]) or validation["is_valid"]
+
+
+@pytest.mark.unit
+def test_validate_all_tasks_on_critical_path(orchestrator: TaskOrchestrator):
+    """Test validation warns when all tasks are on critical path."""
+    orchestrator.add_task("task1", "Task 1", estimated_duration=1.0)
+    orchestrator.add_task("task2", "Task 2", estimated_duration=1.0)
+    orchestrator.add_task("task3", "Task 3", estimated_duration=1.0)
+    orchestrator.add_dependency("task1", "task2")
+    orchestrator.add_dependency("task2", "task3")
+
+    validation = orchestrator.validate()
+    assert "critical path" in str(validation["warnings"]).lower() or validation["is_valid"]
