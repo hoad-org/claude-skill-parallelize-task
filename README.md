@@ -15,25 +15,25 @@ Enterprise-grade task orchestration and parallel process optimization for Claude
 ### Private Index (Recommended)
 ```bash
 export GITHUB_TOKEN=your_github_token
-pip install --index-url https://__token__:${GITHUB_TOKEN}@github.com/hoad-org/python-packages-private/simple/ orchestration-skill==1.0.0
+pip install --index-url https://__token__:${GITHUB_TOKEN}@github.com/hoad-org/python-packages-private/simple/ claude-skill-parallelize-task==1.0.0
 ```
 
 ### Public Index
 ```bash
-pip install --index-url https://hoad-org.github.io/python-packages orchestration-skill==1.0.0
+pip install --index-url https://hoad-org.github.io/python-packages claude-skill-parallelize-task==1.0.0
 ```
 
 ### From Source
 ```bash
-git clone https://github.com/hoad-org/orchestration-skill.git
-cd orchestration-skill
+git clone https://github.com/hoad-org/claude-skill-parallelize-task.git
+cd claude-skill-parallelize-task
 pip install -e .
 ```
 
 ## Quick Start
 
 ```python
-from orchestration_skill import TaskOrchestrator
+from parallelizer_skill import TaskOrchestrator
 
 # Create orchestrator
 orch = TaskOrchestrator()
@@ -207,7 +207,7 @@ analysis = orch.analyze()
 pytest
 
 # With coverage
-pytest --cov=src/orchestration_skill --cov-report=html
+pytest --cov=src/parallelizer_skill --cov-report=html
 
 # Specific test types
 pytest -m unit          # Unit tests
@@ -218,7 +218,7 @@ pytest -m optimization  # Optimization tests
 ## Architecture
 
 ```
-src/orchestration_skill/
+src/parallelizer_skill/
 ├── __init__.py           # Main exports
 ├── models.py             # Task, Dependency, ExecutionPlan models
 ├── dag_analyzer.py       # DAG analysis using NetworkX
@@ -249,4 +249,4 @@ MIT
 
 ## Support
 
-For issues and feature requests: https://github.com/hoad-org/orchestration-skill/issues
+For issues and feature requests: https://github.com/hoad-org/claude-skill-parallelize-task/issues

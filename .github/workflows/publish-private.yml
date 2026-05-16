@@ -27,7 +27,7 @@ jobs:
           pip install -e .
 
       - name: Run tests
-        run: pytest tests/ -v --cov=src/orchestration_skill --cov-report=xml
+        run: pytest tests/ -v --cov=src/parallelizer_skill --cov-report=xml
 
       - name: Security checks
         run: |
@@ -82,12 +82,12 @@ jobs:
           {
             "name": "${{ steps.version.outputs.package_name }}",
             "version": "${{ steps.version.outputs.version }}",
-            "repository": "https://github.com/hoad-org/orchestration-skill",
+            "repository": "https://github.com/hoad-org/claude-skill-parallelize-task",
             "published_at": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')",
             "python_requires": ">=3.12",
             "distributions": [
-              "orchestration_skill-${{ steps.version.outputs.version }}-py3-none-any.whl",
-              "orchestration_skill-${{ steps.version.outputs.version }}.tar.gz"
+              "claude_skill_parallelize_task-${{ steps.version.outputs.version }}-py3-none-any.whl",
+              "claude_skill_parallelize_task-${{ steps.version.outputs.version }}.tar.gz"
             ]
           }
           EOF
@@ -112,12 +112,12 @@ jobs:
           {
             "name": "${{ steps.version.outputs.package_name }}",
             "version": "${{ steps.version.outputs.version }}",
-            "repository": "https://github.com/hoad-org/orchestration-skill",
+            "repository": "https://github.com/hoad-org/claude-skill-parallelize-task",
             "published_at": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')",
             "python_requires": ">=3.12",
             "distributions": [
-              "orchestration_skill-${{ steps.version.outputs.version }}-py3-none-any.whl",
-              "orchestration_skill-${{ steps.version.outputs.version }}.tar.gz"
+              "claude_skill_parallelize_task-${{ steps.version.outputs.version }}-py3-none-any.whl",
+              "claude_skill_parallelize_task-${{ steps.version.outputs.version }}.tar.gz"
             ]
           }
           EOF
