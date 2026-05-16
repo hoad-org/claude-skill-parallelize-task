@@ -70,9 +70,9 @@ jobs:
 
       - name: Publish to python-packages-private repo (Private)
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/hoad-org/python-packages-private.git /tmp/python-packages-private
+          git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/hoad-org/python-packages-private.git" /tmp/python-packages-private
           cd /tmp/python-packages-private
 
           mkdir -p packages/${{ steps.version.outputs.package_name }}
@@ -100,9 +100,9 @@ jobs:
 
       - name: Publish to python-packages repo (Public)
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/hoad-org/python-packages.git /tmp/python-packages
+          git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/hoad-org/python-packages.git" /tmp/python-packages
           cd /tmp/python-packages
 
           mkdir -p packages/${{ steps.version.outputs.package_name }}
@@ -131,7 +131,7 @@ jobs:
       - name: Create Release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ steps.version.outputs.version }}
