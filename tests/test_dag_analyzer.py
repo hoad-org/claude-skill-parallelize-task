@@ -1,8 +1,8 @@
 """Tests for DAG analyzer."""
 
 import pytest
-from orchestration_skill.models import Task, TaskDependency, DependencyType
-from orchestration_skill.dag_analyzer import DAGAnalyzer
+from parallelizer_skill.models import Task, TaskDependency, DependencyType
+from parallelizer_skill.dag_analyzer import DAGAnalyzer
 
 
 @pytest.fixture

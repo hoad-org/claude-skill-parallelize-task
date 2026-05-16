@@ -1,8 +1,8 @@
 """Tests for task orchestrator."""
 
 import pytest
-from orchestration_skill.optimizer import TaskOrchestrator
-from orchestration_skill.models import TaskPriority
+from parallelizer_skill.optimizer import TaskOrchestrator
+from parallelizer_skill.models import TaskPriority
 
 
 @pytest.fixture
