@@ -27,3 +27,4 @@ htmlcov/
 .venv
 env/
 venv/
+.git/hooks/

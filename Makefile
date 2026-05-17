@@ -33,3 +33,20 @@ clean:
 	rm -rf .pytest_cache .coverage htmlcov
 	rm -rf .mypy_cache .ruff_cache
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+
+.PHONY: install-hooks
+install-hooks:
+	@echo "Installing git hooks..."
+	@mkdir -p .git-hooks-local
+	@if [ -f .claude/pre-commit-hook-template.sh ]; then \
+		cp .claude/pre-commit-hook-template.sh .git-hooks-local/pre-commit; \
+		chmod +x .git-hooks-local/pre-commit; \
+		git config core.hooksPath .git-hooks-local; \
+		echo "✅ Git hooks installed"; \
+	else \
+		echo "⚠️  Hook template not found at .claude/pre-commit-hook-template.sh"; \
+	fi
+
+.PHONY: setup
+setup: install-hooks
+	@echo "✅ Development environment ready"
