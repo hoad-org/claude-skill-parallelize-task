@@ -3,7 +3,6 @@
 
 import argparse
 import sys
-from typing import Any
 
 from parallelizer_skill import __version__
 from parallelizer_skill.execution_planner import ExecutionPlanner
@@ -24,7 +23,8 @@ def main() -> int:
     )
 
     parser.add_argument(
-        "-v", "--verbose",
+        "-v",
+        "--verbose",
         action="store_true",
         help="Enable verbose output",
     )
@@ -46,12 +46,6 @@ def main() -> int:
         help="Output file for execution plan",
     )
 
-    # version command
-    version_parser = subparsers.add_parser(
-        "version",
-        help="Show version information",
-    )
-
     args = parser.parse_args()
 
     if args.command == "version" or not args.command:
@@ -61,6 +55,7 @@ def main() -> int:
     if args.command == "analyze":
         try:
             import json
+
             with open(args.tasks_json) as f:
                 tasks_data = json.load(f)
 

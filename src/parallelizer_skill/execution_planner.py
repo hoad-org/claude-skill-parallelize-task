@@ -104,7 +104,9 @@ class ExecutionPlanner:
 
         return groups
 
-    def _find_compatible_tasks(self, base_task_id: str, available_tasks: List[str], grouped_tasks: Set[str]) -> List[str]:
+    def _find_compatible_tasks(
+        self, base_task_id: str, available_tasks: List[str], grouped_tasks: Set[str]
+    ) -> List[str]:
         """Find tasks that can run in parallel with base task."""
         compatible = []
         base_task = self.tasks[base_task_id]

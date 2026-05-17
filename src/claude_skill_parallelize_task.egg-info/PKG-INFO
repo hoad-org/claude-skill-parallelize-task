@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: claude-skill-parallelize-task
-Version: 1.0.0
+Version: 1.1.0
 Summary: Claude skill for intelligent task parallelization, dependency analysis, and agentic workflow optimization
 Author-email: Claude Code <claude@anthropic.com>
 License: MIT

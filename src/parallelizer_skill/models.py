@@ -1,6 +1,5 @@
 """Core models for task orchestration."""
 
-from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field
@@ -99,7 +98,9 @@ class ExecutionPlan(BaseModel):
     efficiency_gain: float = Field(..., description="Percentage improvement from parallelization")
     phases: List[ExecutionPhase] = Field(..., description="Execution phases")
     critical_path: List[str] = Field(..., description="Task IDs on the critical path")
-    parallelizable_groups: Dict[str, List[str]] = Field(default_factory=dict, description="Groups of parallelizable tasks")
+    parallelizable_groups: Dict[str, List[str]] = Field(
+        default_factory=dict, description="Groups of parallelizable tasks"
+    )
     resource_conflicts: List[str] = Field(default_factory=list, description="Identified resource conflicts")
     safety_issues: List[str] = Field(default_factory=list, description="Safety warnings/issues")
     optimization_notes: List[str] = Field(default_factory=list, description="Notes on optimization strategy")

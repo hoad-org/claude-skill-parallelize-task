@@ -1,7 +1,7 @@
 """Tests for DAG analyzer."""
 
 import pytest
-from parallelizer_skill.models import Task, TaskDependency, DependencyType
+from parallelizer_skill.models import Task, TaskDependency
 from parallelizer_skill.dag_analyzer import DAGAnalyzer
 
 

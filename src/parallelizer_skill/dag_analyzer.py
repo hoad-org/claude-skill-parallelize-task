@@ -1,6 +1,6 @@
 """Directed Acyclic Graph analysis for task dependencies."""
 
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Set
 import networkx as nx
 
 from parallelizer_skill.models import Task, TaskDependency, DependencyType
@@ -38,7 +38,7 @@ class DAGAnalyzer:
         """Get all cycles in the graph."""
         try:
             return list(nx.simple_cycles(self.graph))
-        except:
+        except Exception:
             return []
 
     def get_critical_path(self) -> List[str]:
