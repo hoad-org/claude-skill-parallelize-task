@@ -6,6 +6,7 @@ rich>=14.0.0
 fastapi>=0.104.0
 uvicorn>=0.24.0
 python-multipart>=0.0.6
+devarmor-core>=0.1.0
 
 [dev]
 pytest>=8.0.0

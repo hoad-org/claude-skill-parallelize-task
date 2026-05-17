@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: claude-skill-parallelize-task
-Version: 1.1.0
+Version: 2.0.0
 Summary: Claude skill for intelligent task parallelization, dependency analysis, and agentic workflow optimization
 Author-email: Claude Code <claude@anthropic.com>
 License: MIT
@@ -14,6 +14,7 @@ Requires-Dist: rich>=14.0.0
 Requires-Dist: fastapi>=0.104.0
 Requires-Dist: uvicorn>=0.24.0
 Requires-Dist: python-multipart>=0.0.6
+Requires-Dist: devarmor-core>=0.1.0
 Provides-Extra: dev
 Requires-Dist: pytest>=8.0.0; extra == "dev"
 Requires-Dist: pytest-cov>=6.0.0; extra == "dev"
