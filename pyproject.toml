@@ -1,6 +1,6 @@
 [project]
 name = "claude-skill-parallelize-task"
-version = "1.0.0"
+version = "1.1.0"
 description = "Claude skill for intelligent task parallelization, dependency analysis, and agentic workflow optimization"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -29,6 +29,9 @@ dev = [
     "bandit>=1.9.0",
     "pip-audit>=2.10.0",
 ]
+
+[project.scripts]
+parallelize-task = "parallelizer_skill.cli:main"
 
 [build-system]
 requires = ["setuptools>=68.0", "wheel"]

@@ -1,6 +1,6 @@
 """Claude skill for intelligent task parallelization and workflow optimization."""
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 from parallelizer_skill.models import Task, TaskDependency, ExecutionPlan, TaskGroup
 from parallelizer_skill.optimizer import TaskOrchestrator
