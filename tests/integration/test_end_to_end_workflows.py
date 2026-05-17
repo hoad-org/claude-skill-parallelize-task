@@ -1,7 +1,6 @@
 """End-to-end workflow tests for Phase 4 integration."""
 
 import pytest
-from pathlib import Path
 
 from parallelizer_skill.orchestrator import WorkflowOrchestrator
 from parallelizer_skill.decision_engine import ParallelizationGoal

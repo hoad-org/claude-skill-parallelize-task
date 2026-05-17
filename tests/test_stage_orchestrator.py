@@ -1,9 +1,7 @@
 """Unit tests for stage orchestration (GAP 3)."""
 
 import pytest
-from parallelizer_skill.stage_orchestrator import (
-    StageOrchestrator, Stage, StageTask, GatePolicy
-)
+from parallelizer_skill.stage_orchestrator import StageOrchestrator, Stage, StageTask, GatePolicy
 from parallelizer_skill.config import reset_config
 
 
@@ -94,12 +92,7 @@ class TestStage:
             StageTask(task_id="task_1", status="complete"),
             StageTask(task_id="task_2", status="complete"),
         ]
-        stage = Stage(
-            stage_number=1,
-            name="Phase 1",
-            tasks=tasks,
-            gate_policy=GatePolicy.ALL_PASS
-        )
+        stage = Stage(stage_number=1, name="Phase 1", tasks=tasks, gate_policy=GatePolicy.ALL_PASS)
         assert stage.is_passed()
 
     def test_stage_is_passed_all_pass_failure(self):
@@ -108,12 +101,7 @@ class TestStage:
             StageTask(task_id="task_1", status="complete"),
             StageTask(task_id="task_2", status="failed"),
         ]
-        stage = Stage(
-            stage_number=1,
-            name="Phase 1",
-            tasks=tasks,
-            gate_policy=GatePolicy.ALL_PASS
-        )
+        stage = Stage(stage_number=1, name="Phase 1", tasks=tasks, gate_policy=GatePolicy.ALL_PASS)
         assert not stage.is_passed()
 
     def test_stage_is_passed_all_complete(self):
@@ -122,49 +110,30 @@ class TestStage:
             StageTask(task_id="task_1", status="complete"),
             StageTask(task_id="task_2", status="failed"),
         ]
-        stage = Stage(
-            stage_number=1,
-            name="Phase 1",
-            tasks=tasks,
-            gate_policy=GatePolicy.ALL_COMPLETE
-        )
+        stage = Stage(stage_number=1, name="Phase 1", tasks=tasks, gate_policy=GatePolicy.ALL_COMPLETE)
         assert stage.is_passed()
 
     def test_stage_is_passed_majority_success(self):
         """Test is_passed with MAJORITY policy success."""
-        tasks = [
-            StageTask(task_id=f"task_{i}", status="complete")
-            for i in range(8)
-        ]
+        tasks = [StageTask(task_id=f"task_{i}", status="complete") for i in range(8)]
         tasks.append(StageTask(task_id="task_8", status="failed"))
         tasks.append(StageTask(task_id="task_9", status="failed"))
 
-        stage = Stage(
-            stage_number=1,
-            name="Phase 1",
-            tasks=tasks,
-            gate_policy=GatePolicy.MAJORITY
-        )
+        stage = Stage(stage_number=1, name="Phase 1", tasks=tasks, gate_policy=GatePolicy.MAJORITY)
         assert stage.is_passed()
 
     def test_stage_is_passed_majority_failure(self):
         """Test is_passed with MAJORITY policy failure."""
-        tasks = [
-            StageTask(task_id=f"task_{i}", status="complete")
-            for i in range(7)
-        ]
-        tasks.extend([
-            StageTask(task_id="task_7", status="failed"),
-            StageTask(task_id="task_8", status="failed"),
-            StageTask(task_id="task_9", status="failed"),
-        ])
-
-        stage = Stage(
-            stage_number=1,
-            name="Phase 1",
-            tasks=tasks,
-            gate_policy=GatePolicy.MAJORITY
+        tasks = [StageTask(task_id=f"task_{i}", status="complete") for i in range(7)]
+        tasks.extend(
+            [
+                StageTask(task_id="task_7", status="failed"),
+                StageTask(task_id="task_8", status="failed"),
+                StageTask(task_id="task_9", status="failed"),
+            ]
         )
+
+        stage = Stage(stage_number=1, name="Phase 1", tasks=tasks, gate_policy=GatePolicy.MAJORITY)
         assert not stage.is_passed()
 
     def test_stage_failed_tasks(self):

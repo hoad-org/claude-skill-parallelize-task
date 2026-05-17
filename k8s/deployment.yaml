@@ -1,0 +1,197 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: parallelizer-api
+  namespace: default
+  labels:
+    app: parallelizer
+    component: api
+    version: "1.1.0"
+  annotations:
+    description: "Claude Skill - Parallelizer Task API deployment"
+    managed-by: "kubernetes"
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: parallelizer
+      component: api
+  template:
+    metadata:
+      labels:
+        app: parallelizer
+        component: api
+        version: "1.1.0"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    spec:
+      # Security context for the pod
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+
+      serviceAccountName: parallelizer
+
+      # Pod disruption budget
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - parallelizer
+                topologyKey: kubernetes.io/hostname
+
+      containers:
+        - name: parallelizer
+          image: parallelize-task:1.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: api
+              containerPort: 8000
+              protocol: TCP
+            - name: metrics
+              containerPort: 9090
+              protocol: TCP
+
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: PYTHONDONTWRITEBYTECODE
+              value: "1"
+            - name: PARALLELIZER_ENV
+              value: "production"
+            - name: PARALLELIZER_LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: parallelizer-config
+                  key: log_level
+            - name: PARALLELIZER_DATA_DIR
+              value: "/app/data"
+            - name: PARALLELIZER_MONITORING_ENABLED
+              value: "true"
+            - name: PARALLELIZER_METRICS_PORT
+              value: "9090"
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: parallelizer-secrets
+                  key: redis_url
+            - name: API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: parallelizer-secrets
+                  key: api_token
+
+          # Resource requests and limits
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+
+          # Liveness probe - restart if unhealthy
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: api
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          # Readiness probe - remove from service if not ready
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: api
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 2
+
+          # Startup probe - for slow-starting containers
+          startupProbe:
+            httpGet:
+              path: /health
+              port: api
+              scheme: HTTP
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 12
+
+          # Volume mounts
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+            - name: logs
+              mountPath: /app/logs
+            - name: config
+              mountPath: /etc/parallelizer
+              readOnly: true
+
+          # Security context for container
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
+
+      # Volumes
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: parallelizer-data-pvc
+        - name: logs
+          emptyDir:
+            medium: Memory
+            sizeLimit: 100Mi
+        - name: config
+          configMap:
+            name: parallelizer-config
+            defaultMode: 0644
+
+      # Termination grace period for clean shutdown
+      terminationGracePeriodSeconds: 30
+
+      # Service account for RBAC
+      serviceAccountName: parallelizer
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: parallelizer-data-pvc
+  namespace: default
+  labels:
+    app: parallelizer
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: standard

@@ -1,0 +1,1 @@
+{"snapshot_id": "recommendation-65b7cc1f-e9a4-4155-b3df-8ce34dcd31e3", "timestamp": "2026-05-17T12:04:28.576843", "state_type": "recommendation", "source_id": "workflow-influence-001", "data": {"strategy_type": "conservative", "max_parallel_tasks": 4, "monitoring_intensity": "normal"}, "checksum": "c28c3ac495414fe41ac5f6223ebb47cd"}

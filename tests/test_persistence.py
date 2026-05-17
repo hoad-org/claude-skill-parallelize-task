@@ -3,10 +3,7 @@
 import pytest
 import tempfile
 from datetime import datetime, timedelta
-from pathlib import Path
-from parallelizer_skill.persistence import (
-    PersistenceManager, PersistenceSnapshot, RecoveryPoint, PersistenceFormat
-)
+from parallelizer_skill.persistence import PersistenceManager, PersistenceSnapshot, RecoveryPoint, PersistenceFormat
 from parallelizer_skill.config import reset_config
 
 

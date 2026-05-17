@@ -1,0 +1,272 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: parallelizer-config
+  namespace: default
+  labels:
+    app: parallelizer
+  annotations:
+    description: "Configuration for parallelizer API"
+data:
+  # Logging configuration
+  log_level: "INFO"
+
+  # Application configuration
+  app_config.yaml: |
+    application:
+      name: "Parallelizer Task API"
+      version: "1.1.0"
+      environment: "production"
+
+    logging:
+      level: "INFO"
+      format: "json"
+      output: "stderr"
+
+    monitoring:
+      enabled: true
+      metrics_port: 9090
+      export_interval: 15
+
+    performance:
+      max_parallel_tasks: 100
+      task_timeout: 3600
+      cache_ttl: 3600
+      optimization_level: 3
+
+    orchestration:
+      data_dir: "/app/data"
+      state_persistence: true
+      checkpoint_interval: 300
+      max_retries: 3
+
+  # Prometheus configuration
+  prometheus_config.yaml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+      external_labels:
+        cluster: "default"
+        service: "parallelizer"
+
+    scrape_configs:
+      - job_name: "parallelizer"
+        static_configs:
+          - targets: ["localhost:9090"]
+        scrape_interval: 30s
+        scrape_timeout: 10s
+
+      - job_name: "kubernetes-pods"
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: true
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+            action: replace
+            target_label: __metrics_path__
+            regex: (.+)
+          - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+            action: replace
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+            target_label: __address__
+
+  # Application settings
+  settings.json: |
+    {
+      "api": {
+        "host": "0.0.0.0",
+        "port": 8000,
+        "workers": 4,
+        "timeout": 300
+      },
+      "database": {
+        "cache_backend": "redis",
+        "persistence_enabled": true,
+        "checkpoint_interval": 300
+      },
+      "features": {
+        "dag_analysis": true,
+        "parallel_execution": true,
+        "performance_optimization": true,
+        "distributed_caching": true,
+        "monitoring_export": true
+      },
+      "limits": {
+        "max_tasks_per_batch": 100,
+        "max_parallel_branches": 50,
+        "max_execution_time": 3600,
+        "max_memory_mb": 2048
+      }
+    }
+
+  # Health check configuration
+  health_config.yaml: |
+    healthChecks:
+      liveness:
+        path: "/health"
+        interval: 30s
+        timeout: 5s
+        failureThreshold: 3
+      readiness:
+        path: "/ready"
+        interval: 10s
+        timeout: 5s
+        failureThreshold: 2
+      startup:
+        path: "/startup"
+        interval: 5s
+        timeout: 5s
+        failureThreshold: 12
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: parallelizer-scripts
+  namespace: default
+  labels:
+    app: parallelizer
+  annotations:
+    description: "Scripts and utilities for parallelizer"
+data:
+  entrypoint.sh: |
+    #!/bin/bash
+    set -e
+
+    echo "Starting Parallelizer Task API..."
+    echo "Version: 1.1.0"
+    echo "Environment: ${PARALLELIZER_ENV:-production}"
+    echo "Data directory: ${PARALLELIZER_DATA_DIR:-/app/data}"
+
+    # Create necessary directories
+    mkdir -p "${PARALLELIZER_DATA_DIR:-/app/data}"
+    mkdir -p /app/logs
+
+    # Wait for dependencies
+    if [ -n "$REDIS_URL" ]; then
+      echo "Waiting for Redis..."
+      until python -c "import redis; redis.from_url('${REDIS_URL}').ping()" 2>/dev/null; do
+        echo "Redis not ready, waiting..."
+        sleep 2
+      done
+      echo "✓ Redis is ready"
+    fi
+
+    # Start the application
+    exec parallelize-task --server
+
+  wait-for-redis.sh: |
+    #!/bin/bash
+    set -e
+
+    HOST=${REDIS_HOST:-redis}
+    PORT=${REDIS_PORT:-6379}
+    PASSWORD=${REDIS_PASSWORD:-}
+
+    echo "Waiting for Redis at $HOST:$PORT..."
+
+    for i in {1..30}; do
+      if nc -z "$HOST" "$PORT" 2>/dev/null; then
+        echo "✓ Redis is available"
+        exit 0
+      fi
+      echo "Attempt $i: Redis not ready, waiting..."
+      sleep 1
+    done
+
+    echo "✗ Redis not available after 30 attempts"
+    exit 1
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: default
+  labels:
+    app: parallelizer
+  annotations:
+    description: "Nginx reverse proxy configuration for parallelizer"
+data:
+  nginx.conf: |
+    user nginx;
+    worker_processes auto;
+    error_log /var/log/nginx/error.log warn;
+    pid /var/run/nginx.pid;
+
+    events {
+      worker_connections 1024;
+    }
+
+    http {
+      include /etc/nginx/mime.types;
+      default_type application/octet-stream;
+
+      log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+      access_log /var/log/nginx/access.log main;
+
+      sendfile on;
+      tcp_nopush on;
+      tcp_nodelay on;
+      keepalive_timeout 65;
+      types_hash_max_size 2048;
+      client_max_body_size 100M;
+
+      # Gzip compression
+      gzip on;
+      gzip_vary on;
+      gzip_proxied any;
+      gzip_comp_level 6;
+      gzip_types text/plain text/css text/xml text/javascript
+                 application/json application/javascript application/xml+rss
+                 application/rss+xml font/truetype font/opentype
+                 application/vnd.ms-fontobject image/svg+xml;
+
+      # Rate limiting
+      limit_req_zone $binary_remote_addr zone=api:10m rate=100r/s;
+
+      upstream parallelizer_backend {
+        least_conn;
+        server parallelizer-api:8000 max_fails=3 fail_timeout=30s;
+      }
+
+      server {
+        listen 80;
+        server_name _;
+
+        location / {
+          limit_req zone=api burst=200 nodelay;
+
+          proxy_pass http://parallelizer_backend;
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection "upgrade";
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_redirect off;
+
+          proxy_connect_timeout 60s;
+          proxy_send_timeout 60s;
+          proxy_read_timeout 60s;
+        }
+
+        location /health {
+          proxy_pass http://parallelizer_backend;
+          access_log off;
+        }
+
+        location /metrics {
+          proxy_pass http://parallelizer_backend;
+          proxy_set_header X-Real-IP $remote_addr;
+        }
+      }
+    }

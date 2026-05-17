@@ -5,22 +5,34 @@ import pytest
 from typing import List, Tuple
 from parallelizer_skill.models import Task, TaskDependency, TaskPriority
 from parallelizer_skill.decision_engine import (
-    DecisionEngine, DecisionContext, ParallelizationGoal,
-    TaskComplexityClass, ResourceConstraint, DependencyDensity,
-    FailureTolerance, PriorityMetric
+    DecisionEngine,
+    DecisionContext,
+    ParallelizationGoal,
+    TaskComplexityClass,
+    ResourceConstraint,
+    DependencyDensity,
+    FailureTolerance,
+    PriorityMetric,
 )
 from parallelizer_skill.complexity import ComplexityScorer
 from parallelizer_skill.dag_analyzer import DAGAnalyzer
 from parallelizer_skill.performance import (
-    PerformanceConfig, PerformanceManager, DecisionCache,
-    AnalysisCache, ParallelExecutor, BatchOptimizer, MetricsCollector,
-    memoize_decision, memoize_analysis
+    PerformanceConfig,
+    PerformanceManager,
+    DecisionCache,
+    AnalysisCache,
+    ParallelExecutor,
+    BatchOptimizer,
+    MetricsCollector,
+    memoize_decision,
+    memoize_analysis,
 )
 
 
 # ============================================================================
 # FIXTURE BUILDERS FOR WORKFLOW SCENARIOS
 # ============================================================================
+
 
 @pytest.fixture
 def small_workflow() -> Tuple[List[Task], List[TaskDependency]]:
@@ -42,8 +54,7 @@ def small_workflow() -> Tuple[List[Task], List[TaskDependency]]:
 @pytest.fixture
 def medium_workflow() -> Tuple[List[Task], List[TaskDependency]]:
     """Medium workflow: 20 tasks, 10 dependencies."""
-    tasks = [Task(id=f"task_{i}", name=f"Task {i}", estimated_duration=float(i % 5 + 1))
-             for i in range(1, 21)]
+    tasks = [Task(id=f"task_{i}", name=f"Task {i}", estimated_duration=float(i % 5 + 1)) for i in range(1, 21)]
 
     dependencies = [
         TaskDependency(source_task_id="task_1", target_task_id="task_2"),
@@ -63,19 +74,23 @@ def medium_workflow() -> Tuple[List[Task], List[TaskDependency]]:
 @pytest.fixture
 def large_workflow() -> Tuple[List[Task], List[TaskDependency]]:
     """Large workflow: 100 tasks, 50 dependencies."""
-    tasks = [Task(id=f"task_{i}", name=f"Task {i}", estimated_duration=float((i % 10) + 1),
-                  parallelizable=(i % 3 != 0),
-                  resource_type=["cpu", "memory", "io"][i % 3])
-             for i in range(1, 101)]
+    tasks = [
+        Task(
+            id=f"task_{i}",
+            name=f"Task {i}",
+            estimated_duration=float((i % 10) + 1),
+            parallelizable=(i % 3 != 0),
+            resource_type=["cpu", "memory", "io"][i % 3],
+        )
+        for i in range(1, 101)
+    ]
 
     dependencies = []
     for i in range(1, 51):
         source_id = f"task_{i}"
         target_id = f"task_{i * 2}"
         if i * 2 <= 100:
-            dependencies.append(
-                TaskDependency(source_task_id=source_id, target_task_id=target_id)
-            )
+            dependencies.append(TaskDependency(source_task_id=source_id, target_task_id=target_id))
 
     return tasks, dependencies
 
@@ -95,14 +110,11 @@ def complex_workflow() -> Tuple[List[Task], List[TaskDependency]]:
             parallelizable=(i % 2 == 0),
             resource_type=resource_types[i % len(resource_types)],
             priority=priorities[i % len(priorities)],
-            max_concurrent=max(1, (i % 5))
+            max_concurrent=max(1, (i % 5)),
         )
         tasks.append(task)
 
-    dependencies = [
-        TaskDependency(source_task_id=f"task_{i}", target_task_id=f"task_{i + 1}")
-        for i in range(1, 10)
-    ]
+    dependencies = [TaskDependency(source_task_id=f"task_{i}", target_task_id=f"task_{i + 1}") for i in range(1, 10)]
 
     return tasks, dependencies
 
@@ -110,8 +122,7 @@ def complex_workflow() -> Tuple[List[Task], List[TaskDependency]]:
 @pytest.fixture
 def dependency_heavy_workflow() -> Tuple[List[Task], List[TaskDependency]]:
     """Dependency-heavy workflow: 10 tasks, 20 dependencies (complex DAG)."""
-    tasks = [Task(id=f"task_{i}", name=f"Task {i}", estimated_duration=2.0)
-             for i in range(1, 11)]
+    tasks = [Task(id=f"task_{i}", name=f"Task {i}", estimated_duration=2.0) for i in range(1, 11)]
 
     dependencies = [
         TaskDependency(source_task_id="task_1", target_task_id="task_2"),
@@ -138,6 +149,7 @@ def dependency_heavy_workflow() -> Tuple[List[Task], List[TaskDependency]]:
 # PERFORMANCE BENCHMARKS
 # ============================================================================
 
+
 @pytest.mark.unit
 class TestDecisionEnginePerformance:
     """Benchmark decision engine performance with various optimizations."""
@@ -152,7 +164,7 @@ class TestDecisionEnginePerformance:
                 q3_resource_constraint=ResourceConstraint.NONE,
                 q4_dependency_density=DependencyDensity.SPARSE,
                 q5_failure_tolerance=FailureTolerance.FAIL_FAST,
-                q6_priority_metric=PriorityMetric.SPEED
+                q6_priority_metric=PriorityMetric.SPEED,
             )
         elapsed = time.perf_counter() - start
 
@@ -396,6 +408,7 @@ class TestOrchestrationPerformance:
 # OPTIMIZATION COMPARISON TESTS
 # ============================================================================
 
+
 @pytest.mark.unit
 class TestOptimizationComparisons:
     """Compare optimization strategies."""
@@ -488,6 +501,7 @@ class TestOptimizationComparisons:
 # ============================================================================
 # SCALING & EFFICIENCY TESTS
 # ============================================================================
+
 
 @pytest.mark.unit
 class TestScalingBehavior:
@@ -598,6 +612,7 @@ class TestMemoryEfficiency:
 # METRICS & REPORTING
 # ============================================================================
 
+
 @pytest.mark.unit
 class TestMetricsReporting:
     """Test performance metrics collection and reporting."""
@@ -648,11 +663,7 @@ class TestMetricsReporting:
 
     def test_performance_summary_report(self, medium_workflow):
         """Generate performance summary report."""
-        config = PerformanceConfig(
-            cache_enabled=True,
-            metrics_enabled=True,
-            enable_batch_optimization=True
-        )
+        config = PerformanceConfig(cache_enabled=True, metrics_enabled=True, enable_batch_optimization=True)
         manager = PerformanceManager(config)
 
         # Record operations
@@ -671,6 +682,7 @@ class TestMetricsReporting:
 # END-TO-END PERFORMANCE TESTS
 # ============================================================================
 
+
 @pytest.mark.unit
 class TestEndToEndPerformance:
     """End-to-end performance tests."""
@@ -679,10 +691,7 @@ class TestEndToEndPerformance:
         """Test complete pipeline on small workflow."""
         tasks, dependencies = small_workflow
         config = PerformanceConfig(
-            cache_enabled=True,
-            metrics_enabled=True,
-            enable_parallel_execution=True,
-            enable_batch_optimization=True
+            cache_enabled=True, metrics_enabled=True, enable_parallel_execution=True, enable_batch_optimization=True
         )
         _manager = PerformanceManager(config)
 

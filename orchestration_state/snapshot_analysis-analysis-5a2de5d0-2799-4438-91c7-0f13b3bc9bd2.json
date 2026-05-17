@@ -1,0 +1,1 @@
+{"snapshot_id": "analysis-analysis-5a2de5d0-2799-4438-91c7-0f13b3bc9bd2", "timestamp": "2026-05-17T12:53:20.865455", "state_type": "analysis", "source_id": "wf-empty", "data": {"analysis_id": "analysis-5a2de5d0-2799-4438-91c7-0f13b3bc9bd2", "total_tasks": 0, "complexity_scores": {}, "critical_path": []}, "checksum": "f152c321c8fd8d989139d445cec47fe2"}

@@ -1,9 +1,7 @@
 """Unit tests for output coordination (GAP 4)."""
 
 import pytest
-from parallelizer_skill.output_coordinator import (
-    OutputPattern, OutputSection, ScratchpadCoordinator, OutputCoordinator
-)
+from parallelizer_skill.output_coordinator import OutputPattern, OutputSection, ScratchpadCoordinator, OutputCoordinator
 
 
 @pytest.mark.unit
@@ -250,7 +248,7 @@ class TestScratchpadCoordinator:
 
     def test_wait_for_section_corrupted(self, coordinator):
         """Test waiting for corrupted section raises error."""
-        section = coordinator.reserve_section("agent_1", "task_1")
+        coordinator.reserve_section("agent_1", "task_1")
         coordinator.complete_write("agent_1", "task_1", "original")
 
         # Corrupt it

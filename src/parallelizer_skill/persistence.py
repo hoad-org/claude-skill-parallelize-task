@@ -11,6 +11,7 @@ from parallelizer_skill.config import get_config
 
 class PersistenceFormat(str, Enum):
     """Format for persisting state."""
+
     JSON = "json"
     JSONL = "jsonl"  # JSON Lines (one object per line)
 
@@ -18,6 +19,7 @@ class PersistenceFormat(str, Enum):
 @dataclass
 class PersistenceSnapshot:
     """A snapshot of state at a point in time."""
+
     snapshot_id: str
     timestamp: datetime = field(default_factory=datetime.utcnow)
     state_type: str = ""  # "orchestration", "stage", "agent", etc.
@@ -29,6 +31,7 @@ class PersistenceSnapshot:
 @dataclass
 class RecoveryPoint:
     """A point in execution that can be recovered from."""
+
     recovery_id: str
     timestamp: datetime = field(default_factory=datetime.utcnow)
     stage_number: int = 0
@@ -129,10 +132,7 @@ class PersistenceManager:
 
     def get_latest_recovery_point(self, source_id: str) -> Optional[RecoveryPoint]:
         """Get the most recent recovery point for a source."""
-        matching = [
-            r for r in self.recovery_points.values()
-            if r.agent_id == source_id or r.task_id == source_id
-        ]
+        matching = [r for r in self.recovery_points.values() if r.agent_id == source_id or r.task_id == source_id]
 
         if not matching:
             return None
@@ -170,10 +170,7 @@ class PersistenceManager:
         from datetime import timedelta
 
         cutoff = datetime.utcnow() - timedelta(hours=max_age_hours)
-        old_snapshots = [
-            sid for sid, s in self.snapshots.items()
-            if s.timestamp < cutoff
-        ]
+        old_snapshots = [sid for sid, s in self.snapshots.items() if s.timestamp < cutoff]
 
         for snapshot_id in old_snapshots:
             self.delete_snapshot(snapshot_id)
@@ -185,10 +182,7 @@ class PersistenceManager:
         from datetime import timedelta
 
         cutoff = datetime.utcnow() - timedelta(hours=max_age_hours)
-        old_points = [
-            rid for rid, r in self.recovery_points.items()
-            if r.timestamp < cutoff
-        ]
+        old_points = [rid for rid, r in self.recovery_points.items() if r.timestamp < cutoff]
 
         for recovery_id in old_points:
             self.delete_recovery_point(recovery_id)

@@ -1,0 +1,1 @@
+{"snapshot_id": "recommendation-89220457-2b24-4181-99cc-8acfdb1b52c1", "timestamp": "2026-05-17T12:05:59.787931", "state_type": "recommendation", "source_id": "workflow-escalation-001", "data": {"strategy_type": "conservative", "max_parallel_tasks": 16, "monitoring_intensity": "normal"}, "checksum": "a0cac3c1f70a463fc493dfb883abaa2d"}

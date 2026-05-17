@@ -1,0 +1,130 @@
+version: '3.8'
+
+services:
+  # Main parallelizer service
+  parallelizer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: parallelize-task-api
+    image: parallelize-task:latest
+    ports:
+      - "8000:8000"
+      - "9090:9090"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - PARALLELIZER_ENV=production
+      - PARALLELIZER_LOG_LEVEL=INFO
+      - PARALLELIZER_DATA_DIR=/app/data
+      - PARALLELIZER_MONITORING_ENABLED=true
+      - PARALLELIZER_METRICS_PORT=9090
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - parallelizer-data:/app/data
+      - parallelizer-logs:/app/logs
+    networks:
+      - parallelizer-network
+    depends_on:
+      redis:
+        condition: service_healthy
+      prometheus:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Redis cache service for distributed caching
+  redis:
+    image: redis:7-alpine
+    container_name: parallelize-task-cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - parallelizer-network
+    command: redis-server --appendonly yes --requirepass redis-password
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+
+  # Prometheus monitoring service
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: parallelize-task-prometheus
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - parallelizer-network
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=30d"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+
+  # Grafana dashboard service (optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: parallelize-task-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_INSTALL_PLUGINS=redis-datasource
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./config/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./config/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    networks:
+      - parallelizer-network
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+
+networks:
+  parallelizer-network:
+    driver: bridge
+
+volumes:
+  parallelizer-data:
+    driver: local
+  parallelizer-logs:
+    driver: local
+  redis-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local

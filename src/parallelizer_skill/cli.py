@@ -8,9 +8,8 @@ from pathlib import Path
 from typing import Optional, Any
 
 from parallelizer_skill import __version__
-from parallelizer_skill.config import get_config
 from parallelizer_skill.orchestrator import WorkflowOrchestrator
-from parallelizer_skill.models import Task, TaskDependency, DependencyType
+from parallelizer_skill.models import Task, TaskDependency
 from parallelizer_skill.decision_engine import ParallelizationGoal
 
 
@@ -164,8 +163,10 @@ def analyze(
             print(output_text)
 
         if verbose:
-            print(f"✅ Analysis complete: {analysis.total_tasks} tasks, "
-                  f"{len(analysis.parallelizable_tasks)} parallelizable")
+            print(
+                f"✅ Analysis complete: {analysis.total_tasks} tasks, "
+                f"{len(analysis.parallelizable_tasks)} parallelizable"
+            )
 
         return 0
 
@@ -216,6 +217,7 @@ def decide(
             analysis_data = _load_json_file(analysis_file)
             # Reconstruct WorkflowAnalysis from data
             from parallelizer_skill.models import WorkflowAnalysis
+
             analysis = WorkflowAnalysis(**analysis_data)
         elif tasks_file:
             # Generate analysis
@@ -309,6 +311,7 @@ def plan(
 
         # Load strategy or use defaults
         from parallelizer_skill.decision_engine import DecisionRecommendation
+
         if strategy_file:
             strategy_data = _load_json_file(strategy_file)
             recommendation = DecisionRecommendation(**strategy_data)
@@ -379,8 +382,10 @@ def plan(
             print(output_text)
 
         if verbose:
-            print(f"✅ Plan created: {len(plan_result.phases)} phases, "
-                  f"{plan_result.efficiency_gain:.1f}% efficiency gain")
+            print(
+                f"✅ Plan created: {len(plan_result.phases)} phases, "
+                f"{plan_result.efficiency_gain:.1f}% efficiency gain"
+            )
 
         return 0
 
@@ -416,6 +421,7 @@ def execute(
         plan_data = _load_json_file(plan_file)
 
         from parallelizer_skill.models import ExecutionPlan
+
         plan = ExecutionPlan(**plan_data)
 
         # Initialize orchestrator
@@ -462,8 +468,9 @@ def execute(
             print(output_text)
 
         if verbose:
-            print(f"✅ Execution complete: {result.status.value}, "
-                  f"{result.tasks_completed}/{plan.total_tasks} tasks")
+            print(
+                f"✅ Execution complete: {result.status.value}, " f"{result.tasks_completed}/{plan.total_tasks} tasks"
+            )
 
         return 0 if result.status.value == "completed" else 1
 
@@ -523,9 +530,9 @@ def document(
                 return {k: serialize_for_json(v) for k, v in obj.items()}
             elif isinstance(obj, list):
                 return [serialize_for_json(item) for item in obj]
-            elif hasattr(obj, 'model_dump'):  # Pydantic model
+            elif hasattr(obj, "model_dump"):  # Pydantic model
                 return serialize_for_json(obj.model_dump())
-            elif hasattr(obj, '__dict__'):
+            elif hasattr(obj, "__dict__"):
                 return serialize_for_json(obj.__dict__)
             elif isinstance(obj, datetime):
                 return obj.isoformat()
@@ -537,7 +544,7 @@ def document(
         if isinstance(impl_plan_list, str):
             impl_plan_list = [impl_plan_list]
         elif not isinstance(impl_plan_list, list):
-            impl_plan_list = list(impl_plan_list) if hasattr(impl_plan_list, '__iter__') else [str(impl_plan_list)]
+            impl_plan_list = list(impl_plan_list) if hasattr(impl_plan_list, "__iter__") else [str(impl_plan_list)]
 
         output_data = {
             "document_id": document.document_id,
@@ -621,6 +628,7 @@ def reset(verbose: bool = False) -> int:
     try:
         # Get config and reset it
         from parallelizer_skill.config import reset_config
+
         reset_config()
 
         if verbose:
@@ -649,7 +657,8 @@ def main() -> int:
     )
 
     parser.add_argument(
-        "-v", "--verbose",
+        "-v",
+        "--verbose",
         action="store_true",
         help="Enable verbose output",
     )
@@ -785,7 +794,7 @@ def main() -> int:
     )
 
     # reset command
-    reset_parser = subparsers.add_parser(
+    _reset_parser = subparsers.add_parser(
         "reset",
         help="Reset internal state",
     )

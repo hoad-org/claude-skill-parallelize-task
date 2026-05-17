@@ -1,0 +1,1 @@
+{"snapshot_id": "result-exec-bbbd2dae-bf65-44af-a387-f88245f704d9", "timestamp": "2026-05-17T12:06:20.412893", "state_type": "execution_result", "source_id": "workflow-consistency-001", "data": {"execution_id": "exec-bbbd2dae-bf65-44af-a387-f88245f704d9", "status": "completed", "tasks_completed": 5, "efficiency": 99.996325}, "checksum": "d6045520aa0c721c7a3dc18cec6373ee"}

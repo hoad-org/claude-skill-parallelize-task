@@ -1,0 +1,1 @@
+{"snapshot_id": "analysis-analysis-853dd437-1d3b-405a-9d38-1e43f2edf5a7", "timestamp": "2026-05-17T12:05:59.833114", "state_type": "analysis", "source_id": "workflow-infeasible-001", "data": {"analysis_id": "analysis-853dd437-1d3b-405a-9d38-1e43f2edf5a7", "total_tasks": 1, "complexity_scores": {"t1": 80.0}, "critical_path": ["t1"]}, "checksum": "ac401a730353692a285c281e2de08798"}

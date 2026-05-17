@@ -2,8 +2,14 @@
 
 import pytest
 from parallelizer_skill.decision_engine import (
-    DecisionEngine, DecisionContext, ParallelizationGoal, TaskComplexityClass,
-    ResourceConstraint, DependencyDensity, FailureTolerance, PriorityMetric
+    DecisionEngine,
+    DecisionContext,
+    ParallelizationGoal,
+    TaskComplexityClass,
+    ResourceConstraint,
+    DependencyDensity,
+    FailureTolerance,
+    PriorityMetric,
 )
 from parallelizer_skill.complexity import ComplexityLevel, FeasibilityRating
 from parallelizer_skill.models import Task, TaskDependency, DependencyType

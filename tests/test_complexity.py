@@ -1,9 +1,7 @@
 """Unit tests for complexity scoring (Phase 2)."""
 
 import pytest
-from parallelizer_skill.complexity import (
-    ComplexityScorer, ComplexityLevel, FeasibilityRating
-)
+from parallelizer_skill.complexity import ComplexityScorer, ComplexityLevel, FeasibilityRating
 from parallelizer_skill.models import Task, TaskDependency, DependencyType
 from parallelizer_skill.config import reset_config
 
@@ -163,9 +161,7 @@ class TestComplexityScorer:
         assert len(score.recommendations) > 0
         # Either subtask or checkpoint recommendation should be present
         assert any(
-            keyword in r.lower()
-            for r in score.recommendations
-            for keyword in ["subtask", "checkpoint", "monitoring"]
+            keyword in r.lower() for r in score.recommendations for keyword in ["subtask", "checkpoint", "monitoring"]
         )
 
     def test_score_workflow(self, scorer):

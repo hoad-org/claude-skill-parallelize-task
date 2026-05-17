@@ -9,6 +9,7 @@ import hashlib
 
 class OutputPattern(str, Enum):
     """Output coordination patterns."""
+
     SCRATCHPAD = "scratchpad_model"  # Shared doc, section-based
     PR = "pr_model"  # Pull requests per agent
     HIERARCHICAL = "hierarchical_model"  # Agent feeds next agent
@@ -20,6 +21,7 @@ class OutputPattern(str, Enum):
 @dataclass
 class OutputSection:
     """Section in scratchpad model."""
+
     agent_id: str
     task_id: str
     status: str = "pending"  # pending, in_progress, complete, failed
@@ -56,6 +58,7 @@ class OutputSection:
 @dataclass
 class OutputCoordination:
     """Coordination for a single output pattern execution."""
+
     pattern: OutputPattern
     orchestration_id: str
     created_at: datetime = field(default_factory=datetime.utcnow)
@@ -123,6 +126,7 @@ class ScratchpadCoordinator:
     def wait_for_section(self, agent_id: str, task_id: str, timeout_seconds: int = 30) -> Optional[str]:
         """Wait for section to complete (for hierarchical/sequential tasks)."""
         import time
+
         key = f"{agent_id}:{task_id}"
 
         if key not in self.sections:
@@ -164,7 +168,7 @@ class ScratchpadCoordinator:
                     "created_at": s.created_at.isoformat(),
                 }
                 for key, s in self.sections.items()
-            }
+            },
         }
 
 

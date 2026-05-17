@@ -1,9 +1,7 @@
 """Unit tests for callback management (Phase 2)."""
 
 import pytest
-from parallelizer_skill.callbacks import (
-    CallbackManager, EventType, CallbackPriority, CallbackEvent
-)
+from parallelizer_skill.callbacks import CallbackManager, EventType, CallbackPriority, CallbackEvent
 from parallelizer_skill.config import reset_config
 
 
@@ -24,6 +22,7 @@ class TestCallbackManager:
 
     def test_register_handler(self, manager):
         """Test registering a handler."""
+
         def handler(event):
             return "handled"
 
@@ -39,6 +38,7 @@ class TestCallbackManager:
 
     def test_unregister_handler(self, manager):
         """Test unregistering a handler."""
+
         def handler(event):
             return "handled"
 
@@ -81,6 +81,7 @@ class TestCallbackManager:
 
     def test_emit_event_failure(self, manager):
         """Test emitting event with failing handler."""
+
         def handler(event):
             raise ValueError("Handler error")
 
@@ -225,6 +226,7 @@ class TestCallbackManager:
 
     def test_execution_history(self, manager):
         """Test execution history tracking."""
+
         def handler(event):
             return "ok"
 
@@ -247,6 +249,7 @@ class TestCallbackManager:
 
     def test_execution_history_filtered_by_event(self, manager):
         """Test filtering execution history by event type."""
+
         def handler(event):
             return "ok"
 
@@ -281,6 +284,7 @@ class TestCallbackManager:
 
     def test_failed_callbacks_tracking(self, manager):
         """Test tracking failed callbacks."""
+
         def failing_handler(event):
             raise ValueError("Error")
 
@@ -303,6 +307,7 @@ class TestCallbackManager:
 
     def test_statistics(self, manager):
         """Test callback statistics."""
+
         def handler(event):
             return "ok"
 
@@ -327,6 +332,7 @@ class TestCallbackManager:
 
     def test_statistics_with_failures(self, manager):
         """Test statistics with failures."""
+
         def failing_handler(event):
             raise ValueError("Error")
 
@@ -351,6 +357,7 @@ class TestCallbackManager:
 
     def test_reset(self, manager):
         """Test reset."""
+
         def handler(event):
             return "ok"
 

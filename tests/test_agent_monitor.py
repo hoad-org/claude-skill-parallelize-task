@@ -2,9 +2,7 @@
 
 import pytest
 from datetime import datetime, timedelta
-from parallelizer_skill.agent_monitor import (
-    AgentMonitor, AgentState, AgentHeartbeat
-)
+from parallelizer_skill.agent_monitor import AgentMonitor, AgentState, AgentHeartbeat
 from parallelizer_skill.config import reset_config
 
 

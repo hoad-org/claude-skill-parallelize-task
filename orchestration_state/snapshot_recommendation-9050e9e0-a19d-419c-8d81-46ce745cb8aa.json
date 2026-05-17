@@ -1,0 +1,1 @@
+{"snapshot_id": "recommendation-9050e9e0-a19d-419c-8d81-46ce745cb8aa", "timestamp": "2026-05-17T12:52:10.357864", "state_type": "recommendation", "source_id": "workflow-data-pipeline-001", "data": {"strategy_type": "conservative", "max_parallel_tasks": 4, "monitoring_intensity": "normal"}, "checksum": "c28c3ac495414fe41ac5f6223ebb47cd"}

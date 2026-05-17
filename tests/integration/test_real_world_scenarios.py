@@ -27,9 +27,7 @@ class TestRealWorldScenarios:
         """Test 20-task data pipeline with data dependencies."""
         workflow_id = "workflow-data-pipeline-001"
 
-        analysis = orchestrator.analyze_workflow(
-            workflow_id, data_pipeline_tasks, data_pipeline_dependencies
-        )
+        analysis = orchestrator.analyze_workflow(workflow_id, data_pipeline_tasks, data_pipeline_dependencies)
 
         assert analysis.total_tasks == 20
         assert len(analysis.parallelizable_tasks) >= 10
@@ -137,8 +135,12 @@ class TestRealWorldScenarios:
         gpu_deps = [
             TaskDependency(source_task_id="prep_1", target_task_id="train_gpu", dependency_type=DependencyType.HARD),
             TaskDependency(source_task_id="prep_2", target_task_id="train_gpu", dependency_type=DependencyType.HARD),
-            TaskDependency(source_task_id="train_gpu", target_task_id="analysis_1", dependency_type=DependencyType.HARD),
-            TaskDependency(source_task_id="train_gpu", target_task_id="analysis_2", dependency_type=DependencyType.HARD),
+            TaskDependency(
+                source_task_id="train_gpu", target_task_id="analysis_1", dependency_type=DependencyType.HARD
+            ),
+            TaskDependency(
+                source_task_id="train_gpu", target_task_id="analysis_2", dependency_type=DependencyType.HARD
+            ),
             TaskDependency(source_task_id="analysis_1", target_task_id="export", dependency_type=DependencyType.HARD),
             TaskDependency(source_task_id="analysis_2", target_task_id="export", dependency_type=DependencyType.HARD),
         ]
@@ -200,12 +202,15 @@ class TestRealWorldScenarios:
 
         batch_deps = [
             TaskDependency(source_task_id="setup", target_task_id="process_1", dependency_type=DependencyType.HARD),
-            *[TaskDependency(
-                source_task_id=f"process_{i}",
-                target_task_id="consolidate",
-                dependency_type=DependencyType.HARD
-            ) for i in range(1, 9)],
-            TaskDependency(source_task_id="consolidate", target_task_id="validate", dependency_type=DependencyType.HARD),
+            *[
+                TaskDependency(
+                    source_task_id=f"process_{i}", target_task_id="consolidate", dependency_type=DependencyType.HARD
+                )
+                for i in range(1, 9)
+            ],
+            TaskDependency(
+                source_task_id="consolidate", target_task_id="validate", dependency_type=DependencyType.HARD
+            ),
         ]
 
         workflow_id = "workflow-batch-001"
@@ -253,19 +258,25 @@ class TestRealWorldScenarios:
         build_deps = [
             TaskDependency(source_task_id="checkout", target_task_id="lint", dependency_type=DependencyType.HARD),
             TaskDependency(source_task_id="checkout", target_task_id="build", dependency_type=DependencyType.HARD),
-            *[TaskDependency(
-                source_task_id="build",
-                target_task_id=f"test_{i}",
-                dependency_type=DependencyType.HARD
-            ) for i in range(1, 5)],
-            *[TaskDependency(
-                source_task_id=f"test_{i}",
-                target_task_id="integration",
-                dependency_type=DependencyType.HARD
-            ) for i in range(1, 5)],
-            TaskDependency(source_task_id="integration", target_task_id="deploy_staging", dependency_type=DependencyType.HARD),
-            TaskDependency(source_task_id="deploy_staging", target_task_id="smoke_test", dependency_type=DependencyType.HARD),
-            TaskDependency(source_task_id="smoke_test", target_task_id="deploy_prod", dependency_type=DependencyType.HARD),
+            *[
+                TaskDependency(source_task_id="build", target_task_id=f"test_{i}", dependency_type=DependencyType.HARD)
+                for i in range(1, 5)
+            ],
+            *[
+                TaskDependency(
+                    source_task_id=f"test_{i}", target_task_id="integration", dependency_type=DependencyType.HARD
+                )
+                for i in range(1, 5)
+            ],
+            TaskDependency(
+                source_task_id="integration", target_task_id="deploy_staging", dependency_type=DependencyType.HARD
+            ),
+            TaskDependency(
+                source_task_id="deploy_staging", target_task_id="smoke_test", dependency_type=DependencyType.HARD
+            ),
+            TaskDependency(
+                source_task_id="smoke_test", target_task_id="deploy_prod", dependency_type=DependencyType.HARD
+            ),
         ]
 
         workflow_id = "workflow-build-001"

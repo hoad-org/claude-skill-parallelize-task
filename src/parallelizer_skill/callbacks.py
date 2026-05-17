@@ -9,6 +9,7 @@ from parallelizer_skill.config import get_config
 
 class EventType(str, Enum):
     """Types of events that trigger callbacks."""
+
     AGENT_SPAWNED = "agent_spawned"
     AGENT_STARTED = "agent_started"
     AGENT_COMPLETED = "agent_completed"
@@ -28,6 +29,7 @@ class EventType(str, Enum):
 
 class CallbackPriority(str, Enum):
     """Priority for callback execution."""
+
     CRITICAL = "critical"
     HIGH = "high"
     NORMAL = "normal"
@@ -37,6 +39,7 @@ class CallbackPriority(str, Enum):
 @dataclass
 class CallbackEvent:
     """Event data passed to callbacks."""
+
     event_type: EventType
     source_id: str  # agent_id, task_id, or orchestration_id
     timestamp: datetime = field(default_factory=datetime.utcnow)
@@ -47,6 +50,7 @@ class CallbackEvent:
 @dataclass
 class CallbackHandler:
     """Registered callback handler."""
+
     handler_id: str
     event_type: EventType
     callback: Callable
@@ -58,6 +62,7 @@ class CallbackHandler:
 @dataclass
 class CallbackResult:
     """Result of callback execution."""
+
     handler_id: str
     event_type: EventType
     success: bool
@@ -133,9 +138,7 @@ class CallbackManager:
                 result.result = callback_result
             except Exception as e:
                 result.error = str(e)
-                self.failed_callbacks[handler.handler_id] = (
-                    self.failed_callbacks.get(handler.handler_id, 0) + 1
-                )
+                self.failed_callbacks[handler.handler_id] = self.failed_callbacks.get(handler.handler_id, 0) + 1
 
                 if handler.error_on_failure:
                     raise
@@ -202,9 +205,7 @@ class CallbackManager:
 
         successful = sum(1 for r in self.execution_history if r.success)
         failed = len(self.execution_history) - successful
-        avg_time = sum(r.execution_time_ms for r in self.execution_history) / len(
-            self.execution_history
-        )
+        avg_time = sum(r.execution_time_ms for r in self.execution_history) / len(self.execution_history)
 
         by_type = {}
         for event_type in EventType:

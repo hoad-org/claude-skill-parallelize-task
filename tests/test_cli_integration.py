@@ -3,7 +3,6 @@
 import json
 import tempfile
 from pathlib import Path
-from unittest.mock import patch, MagicMock
 
 import pytest
 
@@ -19,16 +18,6 @@ from parallelizer_skill.cli import (
     _format_json_output,
     _format_text_summary,
 )
-from parallelizer_skill.models import (
-    Task,
-    TaskDependency,
-    DependencyType,
-    WorkflowAnalysis,
-    ExecutionPlan,
-    ExecutionPhase,
-    TaskGroup,
-)
-from parallelizer_skill.decision_engine import DecisionRecommendation
 from parallelizer_skill.config import reset_config
 
 
@@ -38,7 +27,7 @@ class TestCLIUtilities:
 
     def test_load_json_file_success(self):
         """Test loading valid JSON file."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             test_data = {"key": "value", "count": 42}
             json.dump(test_data, f)
             temp_path = f.name
@@ -56,7 +45,7 @@ class TestCLIUtilities:
 
     def test_load_json_file_invalid_json(self):
         """Test loading invalid JSON."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             f.write("{ invalid json }")
             temp_path = f.name
 
@@ -109,7 +98,7 @@ class TestAnalyzeCommand:
             {"id": "t1", "name": "Task 1", "estimated_duration": 1.0, "parallelizable": True},
             {"id": "t2", "name": "Task 2", "estimated_duration": 2.0, "parallelizable": True},
         ]
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump(tasks, f)
             f.flush()
             temp_path = f.name
@@ -119,10 +108,8 @@ class TestAnalyzeCommand:
     @pytest.fixture
     def sample_dependencies_file(self):
         """Create sample dependencies JSON file."""
-        deps = [
-            {"source_task_id": "t1", "target_task_id": "t2", "dependency_type": "hard"}
-        ]
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        deps = [{"source_task_id": "t1", "target_task_id": "t2", "dependency_type": "hard"}]
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump(deps, f)
             f.flush()
             temp_path = f.name
@@ -174,7 +161,7 @@ class TestAnalyzeCommand:
     def test_analyze_command_invalid_json(self):
         """Test analysis with invalid JSON."""
         reset_config()
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             f.write("invalid json")
             temp_path = f.name
 
@@ -190,7 +177,7 @@ class TestAnalyzeCommand:
     def test_analyze_command_invalid_format(self, sample_tasks_file):
         """Test analysis with invalid JSON format (not list)."""
         reset_config()
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump({"not": "list"}, f)
             temp_path = f.name
 
@@ -224,7 +211,7 @@ class TestDecideCommand:
             {"id": "t1", "name": "Task 1", "estimated_duration": 1.0, "parallelizable": True},
             {"id": "t2", "name": "Task 2", "estimated_duration": 2.0, "parallelizable": False},
         ]
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump(tasks, f)
             yield f.name
         Path(f.name).unlink()
@@ -247,7 +234,7 @@ class TestDecideCommand:
             "resource_conflicts": [],
             "warnings": [],
         }
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump(analysis, f)
             f.flush()
             temp_path = f.name
@@ -263,7 +250,7 @@ class TestDecideCommand:
                 {"id": "t2", "name": "Task 2", "estimated_duration": 2.0, "parallelizable": False},
             ]
             tasks_file = str(Path(temp_dir) / "tasks.json")
-            with open(tasks_file, 'w') as f:
+            with open(tasks_file, "w") as f:
                 json.dump(tasks, f)
 
             for goal in ["performance", "cost", "reliability"]:
@@ -293,7 +280,7 @@ class TestDecideCommand:
                 {"id": "t2", "name": "Task 2", "estimated_duration": 2.0, "parallelizable": True},
             ]
             tasks_file = str(Path(temp_dir) / "tasks.json")
-            with open(tasks_file, 'w') as f:
+            with open(tasks_file, "w") as f:
                 json.dump(tasks, f)
 
             output_file = str(Path(temp_dir) / "strategy.json")
@@ -334,7 +321,7 @@ class TestDecideCommand:
                 {"id": "t2", "name": "Task 2", "estimated_duration": 2.0, "parallelizable": True},
             ]
             tasks_file = str(Path(temp_dir) / "tasks.json")
-            with open(tasks_file, 'w') as f:
+            with open(tasks_file, "w") as f:
                 json.dump(tasks, f)
 
             result = decide(
@@ -356,7 +343,7 @@ class TestPlanCommand:
             {"id": "t1", "name": "Task 1", "estimated_duration": 1.0, "parallelizable": True},
             {"id": "t2", "name": "Task 2", "estimated_duration": 2.0, "parallelizable": True},
         ]
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump(tasks, f)
             yield f.name
         Path(f.name).unlink()
@@ -376,7 +363,7 @@ class TestPlanCommand:
             "escalation_level": "warning",
             "rationale": "Test strategy",
         }
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump(strategy, f)
             f.flush()
             temp_path = f.name
@@ -392,7 +379,7 @@ class TestPlanCommand:
                 {"id": "t2", "name": "Task 2", "estimated_duration": 2.0, "parallelizable": True},
             ]
             tasks_file = str(Path(temp_dir) / "tasks.json")
-            with open(tasks_file, 'w') as f:
+            with open(tasks_file, "w") as f:
                 json.dump(tasks, f)
 
             result = plan(
@@ -410,7 +397,7 @@ class TestPlanCommand:
                 {"id": "t2", "name": "Task 2", "estimated_duration": 2.0, "parallelizable": True},
             ]
             tasks_file = str(Path(temp_dir) / "tasks.json")
-            with open(tasks_file, 'w') as f:
+            with open(tasks_file, "w") as f:
                 json.dump(tasks, f)
 
             strategy = {
@@ -426,7 +413,7 @@ class TestPlanCommand:
                 "rationale": "Test strategy",
             }
             strategy_file = str(Path(temp_dir) / "strategy.json")
-            with open(strategy_file, 'w') as f:
+            with open(strategy_file, "w") as f:
                 json.dump(strategy, f)
 
             result = plan(
@@ -445,7 +432,7 @@ class TestPlanCommand:
                 {"id": "t2", "name": "Task 2", "estimated_duration": 2.0, "parallelizable": True},
             ]
             tasks_file = str(Path(temp_dir) / "tasks.json")
-            with open(tasks_file, 'w') as f:
+            with open(tasks_file, "w") as f:
                 json.dump(tasks, f)
 
             output_file = str(Path(temp_dir) / "plan.json")
@@ -475,7 +462,7 @@ class TestPlanCommand:
                 {"id": "t2", "name": "Task 2", "estimated_duration": 2.0, "parallelizable": True},
             ]
             tasks_file = str(Path(temp_dir) / "tasks.json")
-            with open(tasks_file, 'w') as f:
+            with open(tasks_file, "w") as f:
                 json.dump(tasks, f)
 
             result = plan(
@@ -521,7 +508,7 @@ class TestExecuteCommand:
             "safety_issues": [],
             "optimization_notes": [],
         }
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump(plan, f)
             f.flush()
             temp_path = f.name
@@ -643,17 +630,17 @@ class TestDocumentCommand:
             "optimization_notes": [],
         }
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump(analysis, f)
             f.flush()
             analysis_file = f.name
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump(recommendation, f)
             f.flush()
             recommendation_file = f.name
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump(plan, f)
             f.flush()
             plan_file = f.name
@@ -684,7 +671,7 @@ class TestDocumentCommand:
                 "warnings": [],
             }
             analysis_file = str(Path(temp_dir) / "analysis.json")
-            with open(analysis_file, 'w') as f:
+            with open(analysis_file, "w") as f:
                 json.dump(analysis, f)
 
             recommendation = {
@@ -700,7 +687,7 @@ class TestDocumentCommand:
                 "rationale": "Test strategy",
             }
             recommendation_file = str(Path(temp_dir) / "recommendation.json")
-            with open(recommendation_file, 'w') as f:
+            with open(recommendation_file, "w") as f:
                 json.dump(recommendation, f)
 
             plan = {
@@ -733,7 +720,7 @@ class TestDocumentCommand:
                 "optimization_notes": [],
             }
             plan_file = str(Path(temp_dir) / "plan.json")
-            with open(plan_file, 'w') as f:
+            with open(plan_file, "w") as f:
                 json.dump(plan, f)
 
             result = document(
@@ -764,7 +751,7 @@ class TestDocumentCommand:
                 "warnings": [],
             }
             analysis_file = str(Path(temp_dir) / "analysis.json")
-            with open(analysis_file, 'w') as f:
+            with open(analysis_file, "w") as f:
                 json.dump(analysis, f)
 
             recommendation = {
@@ -780,7 +767,7 @@ class TestDocumentCommand:
                 "rationale": "Test",
             }
             recommendation_file = str(Path(temp_dir) / "recommendation.json")
-            with open(recommendation_file, 'w') as f:
+            with open(recommendation_file, "w") as f:
                 json.dump(recommendation, f)
 
             plan = {
@@ -797,7 +784,7 @@ class TestDocumentCommand:
                 "optimization_notes": [],
             }
             plan_file = str(Path(temp_dir) / "plan.json")
-            with open(plan_file, 'w') as f:
+            with open(plan_file, "w") as f:
                 json.dump(plan, f)
 
             result = document(
@@ -828,7 +815,7 @@ class TestDocumentCommand:
                 "warnings": [],
             }
             analysis_file = str(Path(temp_dir) / "analysis.json")
-            with open(analysis_file, 'w') as f:
+            with open(analysis_file, "w") as f:
                 json.dump(analysis, f)
 
             recommendation = {
@@ -844,7 +831,7 @@ class TestDocumentCommand:
                 "rationale": "Test",
             }
             recommendation_file = str(Path(temp_dir) / "recommendation.json")
-            with open(recommendation_file, 'w') as f:
+            with open(recommendation_file, "w") as f:
                 json.dump(recommendation, f)
 
             plan = {
@@ -861,7 +848,7 @@ class TestDocumentCommand:
                 "optimization_notes": [],
             }
             plan_file = str(Path(temp_dir) / "plan.json")
-            with open(plan_file, 'w') as f:
+            with open(plan_file, "w") as f:
                 json.dump(plan, f)
 
             output_file = str(Path(temp_dir) / "strategy.md")
@@ -899,6 +886,7 @@ class TestResetCommand:
     def test_reset_clears_config(self):
         """Test that reset clears configuration."""
         from parallelizer_skill.config import get_config
+
         reset_config()
 
         # Get config to cache it
@@ -928,7 +916,7 @@ class TestCommandPiping:
                 {"id": "t2", "name": "Task 2", "estimated_duration": 2.0, "parallelizable": True},
             ]
             tasks_file = str(Path(temp_dir) / "tasks.json")
-            with open(tasks_file, 'w') as f:
+            with open(tasks_file, "w") as f:
                 json.dump(tasks, f)
 
             # Run analyze
@@ -958,7 +946,7 @@ class TestCommandPiping:
                 {"id": "t1", "name": "Task 1", "estimated_duration": 1.0, "parallelizable": True},
             ]
             tasks_file = str(Path(temp_dir) / "tasks.json")
-            with open(tasks_file, 'w') as f:
+            with open(tasks_file, "w") as f:
                 json.dump(tasks, f)
 
             # Run plan
@@ -972,7 +960,7 @@ class TestCommandPiping:
             assert Path(plan_file).exists()
 
             # Verify plan file is readable
-            with open(plan_file, 'r') as f:
+            with open(plan_file, "r") as f:
                 plan_data = json.load(f)
             assert plan_data is not None
             assert "id" in plan_data
@@ -998,7 +986,7 @@ class TestJSONOutputFormat:
                 {"id": "t1", "name": "Task 1", "estimated_duration": 1.0, "parallelizable": True},
             ]
             tasks_file = str(Path(temp_dir) / "tasks.json")
-            with open(tasks_file, 'w') as f:
+            with open(tasks_file, "w") as f:
                 json.dump(tasks, f)
 
             output_file = str(Path(temp_dir) / "output.json")
@@ -1023,11 +1011,11 @@ class TestJSONOutputFormat:
                 {"id": "t1", "name": "Task 1", "estimated_duration": 1.0, "parallelizable": True},
             ]
             tasks_file = str(Path(temp_dir) / "tasks.json")
-            with open(tasks_file, 'w') as f:
+            with open(tasks_file, "w") as f:
                 json.dump(tasks, f)
 
             output_file = str(Path(temp_dir) / "output.json")
-            result = execute(
+            execute(
                 plan_file=tasks_file,  # This will fail, but we test the JSON serialization
                 output_file=output_file,
                 output_format="json",
@@ -1054,7 +1042,7 @@ class TestErrorHandling:
         with tempfile.TemporaryDirectory() as temp_dir:
             tasks = [{"id": "t1", "name": "Task 1", "estimated_duration": 1.0, "parallelizable": True}]
             tasks_file = str(Path(temp_dir) / "tasks.json")
-            with open(tasks_file, 'w') as f:
+            with open(tasks_file, "w") as f:
                 json.dump(tasks, f)
 
             result = decide(
@@ -1070,12 +1058,12 @@ class TestErrorHandling:
         with tempfile.TemporaryDirectory() as temp_dir:
             tasks = [{"id": "t1", "name": "Task 1", "estimated_duration": 1.0, "parallelizable": True}]
             tasks_file = str(Path(temp_dir) / "tasks.json")
-            with open(tasks_file, 'w') as f:
+            with open(tasks_file, "w") as f:
                 json.dump(tasks, f)
 
             # Invalid strategy file
             strategy_file = str(Path(temp_dir) / "strategy.json")
-            with open(strategy_file, 'w') as f:
+            with open(strategy_file, "w") as f:
                 json.dump({"incomplete": "data"}, f)
 
             result = plan(
@@ -1096,7 +1084,7 @@ class TestDecideCommandExtended:
         with tempfile.TemporaryDirectory() as temp_dir:
             tasks = [{"id": "t1", "name": "Task 1", "estimated_duration": 2.0, "parallelizable": True}]
             tasks_file = str(Path(temp_dir) / "tasks.json")
-            with open(tasks_file, 'w') as f:
+            with open(tasks_file, "w") as f:
                 json.dump(tasks, f)
 
             analysis = {
@@ -1115,7 +1103,7 @@ class TestDecideCommandExtended:
                 "warnings": [],
             }
             analysis_file = str(Path(temp_dir) / "analysis.json")
-            with open(analysis_file, 'w') as f:
+            with open(analysis_file, "w") as f:
                 json.dump(analysis, f)
 
             result = decide(
@@ -1132,7 +1120,7 @@ class TestDecideCommandExtended:
         with tempfile.TemporaryDirectory() as temp_dir:
             tasks = [{"id": "t1", "name": "Task 1", "estimated_duration": 1.0, "parallelizable": True}]
             tasks_file = str(Path(temp_dir) / "tasks.json")
-            with open(tasks_file, 'w') as f:
+            with open(tasks_file, "w") as f:
                 json.dump(tasks, f)
 
             result = decide(
@@ -1151,6 +1139,7 @@ class TestCLIUtilitiesExtended:
     def test_format_text_summary_with_dict(self):
         """Test text summary formatting with dictionary data."""
         from parallelizer_skill.cli import _format_text_summary
+
         data = {"key1": "value1", "key2": {"nested": "value2"}}
         result = _format_text_summary("Test Title", data)
         assert "Test Title" in result
@@ -1160,6 +1149,7 @@ class TestCLIUtilitiesExtended:
     def test_format_text_summary_with_lists(self):
         """Test text summary formatting with list data."""
         from parallelizer_skill.cli import _format_text_summary
+
         data = {"items": ["item1", "item2", "item3"]}
         result = _format_text_summary("Items", data)
         assert "Items" in result
@@ -1168,6 +1158,7 @@ class TestCLIUtilitiesExtended:
     def test_save_json_file_creates_directory(self):
         """Test that save_json_file creates parent directories."""
         from parallelizer_skill.cli import _save_json_file
+
         with tempfile.TemporaryDirectory() as temp_dir:
             nested_path = str(Path(temp_dir) / "level1" / "level2" / "data.json")
             data = {"test": "data"}
@@ -1187,7 +1178,7 @@ class TestAnalyzeCommandExtended:
         with tempfile.TemporaryDirectory() as temp_dir:
             tasks = [{"id": "t1", "name": "Task 1", "estimated_duration": 1.0, "parallelizable": True}]
             tasks_file = str(Path(temp_dir) / "tasks.json")
-            with open(tasks_file, 'w') as f:
+            with open(tasks_file, "w") as f:
                 json.dump(tasks, f)
 
             output_file = str(Path(temp_dir) / "analysis.json")
@@ -1209,7 +1200,7 @@ class TestAnalyzeCommandExtended:
                 {"id": "t2", "name": "Task 2", "estimated_duration": 2.0, "parallelizable": True},
             ]
             tasks_file = str(Path(temp_dir) / "tasks.json")
-            with open(tasks_file, 'w') as f:
+            with open(tasks_file, "w") as f:
                 json.dump(tasks, f)
 
             result = analyze(
@@ -1233,7 +1224,7 @@ class TestPlanCommandExtended:
                 {"id": "t2", "name": "Task 2", "estimated_duration": 2.0, "parallelizable": True},
             ]
             tasks_file = str(Path(temp_dir) / "tasks.json")
-            with open(tasks_file, 'w') as f:
+            with open(tasks_file, "w") as f:
                 json.dump(tasks, f)
 
             result = plan(
@@ -1278,7 +1269,7 @@ class TestExecuteCommandExtended:
                 "parallelizable_groups": {},
             }
             plan_file = str(Path(temp_dir) / "plan.json")
-            with open(plan_file, 'w') as f:
+            with open(plan_file, "w") as f:
                 json.dump(plan_data, f)
 
             result = execute(
@@ -1319,7 +1310,7 @@ class TestDecideCommandErrorPaths:
         reset_config()
         with tempfile.TemporaryDirectory() as temp_dir:
             analysis_file = str(Path(temp_dir) / "analysis.json")
-            with open(analysis_file, 'w') as f:
+            with open(analysis_file, "w") as f:
                 f.write("{invalid json")
 
             result = decide(
@@ -1340,11 +1331,11 @@ class TestPlanCommandErrorPaths:
         with tempfile.TemporaryDirectory() as temp_dir:
             tasks = [{"id": "t1", "name": "Task 1", "estimated_duration": 1.0, "parallelizable": True}]
             tasks_file = str(Path(temp_dir) / "tasks.json")
-            with open(tasks_file, 'w') as f:
+            with open(tasks_file, "w") as f:
                 json.dump(tasks, f)
 
             strategy_file = str(Path(temp_dir) / "strategy.json")
-            with open(strategy_file, 'w') as f:
+            with open(strategy_file, "w") as f:
                 f.write("{invalid json")
 
             result = plan(
@@ -1364,7 +1355,7 @@ class TestExecuteCommandErrorPaths:
         reset_config()
         with tempfile.TemporaryDirectory() as temp_dir:
             plan_file = str(Path(temp_dir) / "plan.json")
-            with open(plan_file, 'w') as f:
+            with open(plan_file, "w") as f:
                 f.write("{invalid json")
 
             result = execute(
@@ -1384,7 +1375,7 @@ class TestOutputFileBehavior:
         with tempfile.TemporaryDirectory() as temp_dir:
             tasks = [{"id": "t1", "name": "Task 1", "estimated_duration": 1.0, "parallelizable": True}]
             tasks_file = str(Path(temp_dir) / "tasks.json")
-            with open(tasks_file, 'w') as f:
+            with open(tasks_file, "w") as f:
                 json.dump(tasks, f)
 
             output_file = str(Path(temp_dir) / "decision.json")
@@ -1431,7 +1422,7 @@ class TestOutputFileBehavior:
             }
             plan_file = str(Path(temp_dir) / "plan.json")
             output_file = str(Path(temp_dir) / "result.json")
-            with open(plan_file, 'w') as f:
+            with open(plan_file, "w") as f:
                 json.dump(plan_data, f)
 
             result = execute(
@@ -1510,11 +1501,11 @@ class TestDocumentCommandExtended:
             plan_file = str(Path(temp_dir) / "plan.json")
             output_file = str(Path(temp_dir) / "output.md")
 
-            with open(analysis_file, 'w') as f:
+            with open(analysis_file, "w") as f:
                 json.dump(analysis, f)
-            with open(recommendation_file, 'w') as f:
+            with open(recommendation_file, "w") as f:
                 json.dump(recommendation, f)
-            with open(plan_file, 'w') as f:
+            with open(plan_file, "w") as f:
                 json.dump(plan, f)
 
             result = document(

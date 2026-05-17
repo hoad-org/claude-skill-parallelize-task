@@ -10,6 +10,7 @@ from typing import Any
 @dataclass
 class OrchestrationConfig:
     """Orchestration settings."""
+
     max_concurrent_agents: int = 6
     max_task_depth: int = 3
     max_execution_time_minutes: int = 60
@@ -22,6 +23,7 @@ class OrchestrationConfig:
 @dataclass
 class TokenBudgetConfig:
     """Token and cost budget settings."""
+
     global_ceiling_per_run: int = 100_000
     per_agent_ceiling: int = 50_000
     reserved_capacity_percent: int = 10
@@ -33,6 +35,7 @@ class TokenBudgetConfig:
 @dataclass
 class ModelSelectionConfig:
     """Model selection strategy."""
+
     haiku_complexity_limit: int = 4
     sonnet_complexity_limit: int = 8
     haiku_confidence_threshold: float = 0.90
@@ -44,6 +47,7 @@ class ModelSelectionConfig:
 @dataclass
 class ThinkingLevelConfig:
     """Extended thinking strategy."""
+
     deterministic_thinking: bool = False
     novel_problem_thinking: bool = True
     prod_risk_thinking: bool = True
@@ -54,6 +58,7 @@ class ThinkingLevelConfig:
 @dataclass
 class OutputPatternConfig:
     """Output coordination patterns."""
+
     code_pattern: str = "pr_model"
     analysis_pattern: str = "scratchpad_model"
     data_pattern: str = "api_model"
@@ -63,6 +68,7 @@ class OutputPatternConfig:
 @dataclass
 class GuardrailsConfig:
     """Safety guardrails."""
+
     circuit_breaker_failure_threshold: int = 3
     health_check_interval_seconds: int = 300
     cost_override_gate: bool = True
@@ -73,6 +79,7 @@ class GuardrailsConfig:
 @dataclass
 class SkillConfig:
     """Complete skill configuration."""
+
     orchestration: OrchestrationConfig = field(default_factory=OrchestrationConfig)
     token_budget: TokenBudgetConfig = field(default_factory=TokenBudgetConfig)
     model_selection: ModelSelectionConfig = field(default_factory=ModelSelectionConfig)
@@ -173,7 +180,7 @@ class ConfigLoader:
         for key, value in os.environ.items():
             if key.startswith(ConfigLoader.ENV_PREFIX):
                 # Extract nested key: PARALLELIZE_TASK_ORCHESTRATION_MAX_AGENTS → orchestration.max_agents
-                relative_key = key[len(ConfigLoader.ENV_PREFIX):].lower()
+                relative_key = key[len(ConfigLoader.ENV_PREFIX) :].lower()
                 parts = relative_key.split("_", 1)  # Split on first underscore
 
                 if len(parts) == 2:

@@ -2,16 +2,9 @@
 
 import pytest
 from datetime import datetime
-from parallelizer_skill.strategy_document import (
-    StrategyDocumentGenerator, StrategyDocument
-)
-from parallelizer_skill.decision_engine import (
-    DecisionRecommendation, ParallelizationGoal, TaskComplexityClass,
-    ResourceConstraint, DependencyDensity, FailureTolerance, PriorityMetric
-)
-from parallelizer_skill.models import (
-    Task, TaskDependency, ExecutionPlan, DependencyType, ExecutionPhase, TaskGroup
-)
+from parallelizer_skill.strategy_document import StrategyDocumentGenerator
+from parallelizer_skill.decision_engine import DecisionRecommendation
+from parallelizer_skill.models import Task, TaskDependency, ExecutionPlan, DependencyType, ExecutionPhase, TaskGroup
 from parallelizer_skill.complexity import ComplexityScore, ComplexityLevel, FeasibilityRating
 from parallelizer_skill.config import reset_config
 
@@ -109,7 +102,7 @@ class TestStrategyDocumentGenerator:
             estimated_duration=7.0,
             sync_point_required=False,
         )
-        
+
         return ExecutionPlan(
             id="plan_1",
             total_tasks=3,
@@ -129,8 +122,13 @@ class TestStrategyDocumentGenerator:
         assert len(generator.documents) == 0
 
     def test_generate_document(
-        self, generator, sample_recommendation, sample_tasks, sample_dependencies,
-        sample_complexity_scores, sample_execution_plan
+        self,
+        generator,
+        sample_recommendation,
+        sample_tasks,
+        sample_dependencies,
+        sample_complexity_scores,
+        sample_execution_plan,
     ):
         """Test generating a strategy document."""
         doc = generator.generate(
@@ -149,8 +147,8 @@ class TestStrategyDocumentGenerator:
         assert doc.analysis_summary is not None
         assert doc.recommendations is not None
 
-    def test_executive_summary(self, generator, sample_recommendation, sample_tasks, sample_dependencies,
-        sample_complexity_scores
+    def test_executive_summary(
+        self, generator, sample_recommendation, sample_tasks, sample_dependencies, sample_complexity_scores
     ):
         """Test executive summary generation."""
         doc = generator.generate(
@@ -167,8 +165,14 @@ class TestStrategyDocumentGenerator:
         assert "BALANCED" in summary
         assert "8" in summary  # max_parallel_tasks
 
-    def test_analysis_summary(self, generator, sample_recommendation, sample_tasks,
-        sample_dependencies, sample_complexity_scores, sample_execution_plan
+    def test_analysis_summary(
+        self,
+        generator,
+        sample_recommendation,
+        sample_tasks,
+        sample_dependencies,
+        sample_complexity_scores,
+        sample_execution_plan,
     ):
         """Test analysis summary generation."""
         doc = generator.generate(
@@ -186,8 +190,8 @@ class TestStrategyDocumentGenerator:
         assert analysis["dependency_count"] == 2
         assert "1.3x" in analysis["potential_speedup"]  # 12.0 / 9.0 ≈ 1.3x
 
-    def test_recommendations_section(self, generator, sample_recommendation, sample_tasks,
-        sample_dependencies, sample_complexity_scores
+    def test_recommendations_section(
+        self, generator, sample_recommendation, sample_tasks, sample_dependencies, sample_complexity_scores
     ):
         """Test recommendations section."""
         doc = generator.generate(
@@ -204,8 +208,8 @@ class TestStrategyDocumentGenerator:
         assert recs["max_parallel_tasks"] == 8
         assert len(recs["key_actions"]) > 0
 
-    def test_implementation_plan(self, generator, sample_recommendation, sample_tasks,
-        sample_dependencies, sample_complexity_scores
+    def test_implementation_plan(
+        self, generator, sample_recommendation, sample_tasks, sample_dependencies, sample_complexity_scores
     ):
         """Test implementation plan generation."""
         doc = generator.generate(
@@ -223,8 +227,8 @@ class TestStrategyDocumentGenerator:
         assert any("EXECUTION" in step for step in plan)
         assert any("RESILIENCE" in step for step in plan)
 
-    def test_risk_assessment(self, generator, sample_recommendation, sample_tasks,
-        sample_dependencies, sample_complexity_scores
+    def test_risk_assessment(
+        self, generator, sample_recommendation, sample_tasks, sample_dependencies, sample_complexity_scores
     ):
         """Test risk assessment generation."""
         doc = generator.generate(
@@ -241,8 +245,14 @@ class TestStrategyDocumentGenerator:
         assert "dependency_risk" in risk
         assert "mitigation_strategies" in risk
 
-    def test_performance_projections_with_plan(self, generator, sample_recommendation,
-        sample_tasks, sample_dependencies, sample_complexity_scores, sample_execution_plan
+    def test_performance_projections_with_plan(
+        self,
+        generator,
+        sample_recommendation,
+        sample_tasks,
+        sample_dependencies,
+        sample_complexity_scores,
+        sample_execution_plan,
     ):
         """Test performance projections with execution plan."""
         doc = generator.generate(
@@ -260,8 +270,8 @@ class TestStrategyDocumentGenerator:
         assert "9.0s" in perf["projected_parallel_duration"]
         assert "1.3x" in perf["expected_speedup"]
 
-    def test_performance_projections_without_plan(self, generator, sample_recommendation,
-        sample_tasks, sample_dependencies, sample_complexity_scores
+    def test_performance_projections_without_plan(
+        self, generator, sample_recommendation, sample_tasks, sample_dependencies, sample_complexity_scores
     ):
         """Test performance projections without execution plan."""
         doc = generator.generate(
@@ -278,11 +288,11 @@ class TestStrategyDocumentGenerator:
         assert perf["projected_serial_duration"] == "Unknown"
         assert perf["projected_parallel_duration"] == "Unknown"
 
-    def test_get_document(self, generator, sample_recommendation, sample_tasks,
-        sample_dependencies, sample_complexity_scores
+    def test_get_document(
+        self, generator, sample_recommendation, sample_tasks, sample_dependencies, sample_complexity_scores
     ):
         """Test retrieving a document."""
-        doc = generator.generate(
+        generator.generate(
             document_id="doc_1",
             title="Test",
             tasks=sample_tasks,
@@ -300,8 +310,14 @@ class TestStrategyDocumentGenerator:
         retrieved = generator.get_document("unknown")
         assert retrieved is None
 
-    def test_render_markdown(self, generator, sample_recommendation, sample_tasks,
-        sample_dependencies, sample_complexity_scores, sample_execution_plan
+    def test_render_markdown(
+        self,
+        generator,
+        sample_recommendation,
+        sample_tasks,
+        sample_dependencies,
+        sample_complexity_scores,
+        sample_execution_plan,
     ):
         """Test Markdown rendering."""
         doc = generator.generate(
@@ -323,9 +339,7 @@ class TestStrategyDocumentGenerator:
         assert "## Risk Assessment" in md
         assert "## Performance Projections" in md
 
-    def test_reset(self, generator, sample_recommendation, sample_tasks,
-        sample_dependencies, sample_complexity_scores
-    ):
+    def test_reset(self, generator, sample_recommendation, sample_tasks, sample_dependencies, sample_complexity_scores):
         """Test reset."""
         generator.generate(
             document_id="doc_1",
@@ -342,8 +356,8 @@ class TestStrategyDocumentGenerator:
 
         assert len(generator.documents) == 0
 
-    def test_multiple_documents(self, generator, sample_recommendation, sample_tasks,
-        sample_dependencies, sample_complexity_scores
+    def test_multiple_documents(
+        self, generator, sample_recommendation, sample_tasks, sample_dependencies, sample_complexity_scores
     ):
         """Test generating multiple documents."""
         for i in range(3):
@@ -361,12 +375,12 @@ class TestStrategyDocumentGenerator:
         assert generator.get_document("doc_1") is not None
         assert generator.get_document("doc_2") is not None
 
-    def test_document_timestamp(self, generator, sample_recommendation, sample_tasks,
-        sample_dependencies, sample_complexity_scores
+    def test_document_timestamp(
+        self, generator, sample_recommendation, sample_tasks, sample_dependencies, sample_complexity_scores
     ):
         """Test document has timestamp."""
         before = datetime.utcnow()
-        
+
         doc = generator.generate(
             document_id="doc_1",
             title="Test",
@@ -377,5 +391,5 @@ class TestStrategyDocumentGenerator:
         )
 
         after = datetime.utcnow()
-        
+
         assert before <= doc.generated_at <= after

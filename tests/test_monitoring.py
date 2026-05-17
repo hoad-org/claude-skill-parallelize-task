@@ -12,10 +12,6 @@ from parallelizer_skill.monitoring import (
     MonitoringConfig,
     WorkflowMetrics,
     PhaseMetrics,
-    WorkflowEvent,
-    ExecutionTrace,
-    HealthCheck,
-    Alert,
     EventLogger,
     TraceCollector,
     HealthMonitor,
@@ -97,9 +93,7 @@ class TestWorkflowMetrics:
 
     def test_phase_metrics_to_dict(self):
         """Test serializing phase metrics."""
-        metrics = PhaseMetrics(
-            phase_number=2, workflow_id="wf_001", task_count=10, tasks_completed=9
-        )
+        metrics = PhaseMetrics(phase_number=2, workflow_id="wf_001", task_count=10, tasks_completed=9)
         data = metrics.to_dict()
 
         assert data["phase_number"] == 2
@@ -322,7 +316,7 @@ class TestTraceCollector:
         """Test getting trace timeline."""
         collector = TraceCollector()
         parent_id = collector.start_trace("parent")
-        child_id = collector.start_trace("child", parent_trace_id=parent_id)
+        collector.start_trace("child", parent_trace_id=parent_id)
 
         timeline = collector.get_trace_timeline(parent_id)
         assert len(timeline) == 2
@@ -545,12 +539,8 @@ class TestAlertManager:
         config = MonitoringConfig()
         manager = AlertManager(config)
 
-        manager.generate_alert(
-            AlertType.PERFORMANCE_DEGRADATION, Severity.WARNING, "msg", 1.5, 2.1
-        )
-        manager.generate_alert(
-            AlertType.HIGH_FAILURE_RATE, Severity.ERROR, "msg", 0.2, 0.4
-        )
+        manager.generate_alert(AlertType.PERFORMANCE_DEGRADATION, Severity.WARNING, "msg", 1.5, 2.1)
+        manager.generate_alert(AlertType.HIGH_FAILURE_RATE, Severity.ERROR, "msg", 0.2, 0.4)
 
         active = manager.get_active_alerts()
         assert len(active) == 2
@@ -560,12 +550,8 @@ class TestAlertManager:
         config = MonitoringConfig()
         manager = AlertManager(config)
 
-        manager.generate_alert(
-            AlertType.PERFORMANCE_DEGRADATION, Severity.WARNING, "msg", 1.5, 2.1
-        )
-        manager.generate_alert(
-            AlertType.HIGH_FAILURE_RATE, Severity.ERROR, "msg", 0.2, 0.4
-        )
+        manager.generate_alert(AlertType.PERFORMANCE_DEGRADATION, Severity.WARNING, "msg", 1.5, 2.1)
+        manager.generate_alert(AlertType.HIGH_FAILURE_RATE, Severity.ERROR, "msg", 0.2, 0.4)
 
         history = manager.get_alert_history()
         assert len(history) == 2
@@ -575,20 +561,12 @@ class TestAlertManager:
         config = MonitoringConfig()
         manager = AlertManager(config)
 
-        manager.generate_alert(
-            AlertType.PERFORMANCE_DEGRADATION, Severity.WARNING, "msg", 1.5, 2.1
-        )
-        manager.generate_alert(
-            AlertType.PERFORMANCE_DEGRADATION, Severity.WARNING, "msg", 1.5, 2.1
-        )
+        manager.generate_alert(AlertType.PERFORMANCE_DEGRADATION, Severity.WARNING, "msg", 1.5, 2.1)
+        manager.generate_alert(AlertType.PERFORMANCE_DEGRADATION, Severity.WARNING, "msg", 1.5, 2.1)
         time.sleep(0.1)
-        manager.generate_alert(
-            AlertType.HIGH_FAILURE_RATE, Severity.ERROR, "msg", 0.2, 0.4
-        )
+        manager.generate_alert(AlertType.HIGH_FAILURE_RATE, Severity.ERROR, "msg", 0.2, 0.4)
 
-        perf_alerts = manager.get_alert_history(
-            alert_type=AlertType.PERFORMANCE_DEGRADATION
-        )
+        perf_alerts = manager.get_alert_history(alert_type=AlertType.PERFORMANCE_DEGRADATION)
         assert len(perf_alerts) == 1
 
     def test_alert_summary(self):
@@ -596,15 +574,9 @@ class TestAlertManager:
         config = MonitoringConfig()
         manager = AlertManager(config)
 
-        manager.generate_alert(
-            AlertType.PERFORMANCE_DEGRADATION, Severity.WARNING, "msg", 1.5, 2.1
-        )
-        manager.generate_alert(
-            AlertType.HIGH_FAILURE_RATE, Severity.ERROR, "msg", 0.2, 0.4
-        )
-        manager.generate_alert(
-            AlertType.PERFORMANCE_DEGRADATION, Severity.WARNING, "msg", 1.5, 2.1
-        )
+        manager.generate_alert(AlertType.PERFORMANCE_DEGRADATION, Severity.WARNING, "msg", 1.5, 2.1)
+        manager.generate_alert(AlertType.HIGH_FAILURE_RATE, Severity.ERROR, "msg", 0.2, 0.4)
+        manager.generate_alert(AlertType.PERFORMANCE_DEGRADATION, Severity.WARNING, "msg", 1.5, 2.1)
 
         summary = manager.get_alert_summary()
         assert summary[AlertType.PERFORMANCE_DEGRADATION] == 1
@@ -615,7 +587,7 @@ class TestAlertManager:
         config = MonitoringConfig()
         manager = AlertManager(config)
 
-        alert_id = manager.generate_alert(
+        manager.generate_alert(
             AlertType.PERFORMANCE_DEGRADATION,
             Severity.WARNING,
             "Perf degraded",

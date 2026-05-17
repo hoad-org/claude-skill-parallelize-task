@@ -1,18 +1,18 @@
 """Performance optimization module with caching, memoization, and metrics (Phase 5)."""
 
 import hashlib
-import time
 from dataclasses import dataclass, field, asdict
 from functools import wraps
 from typing import Any, Callable, Dict, List, Optional, Tuple
 from collections import OrderedDict
-from datetime import datetime, timedelta
+from datetime import datetime
 import threading
 
 
 @dataclass
 class PerformanceConfig:
     """Performance optimization configuration."""
+
     cache_enabled: bool = True
     cache_ttl_seconds: int = 3600
     cache_max_size: int = 1000
@@ -25,6 +25,7 @@ class PerformanceConfig:
 @dataclass
 class OperationMetrics:
     """Metrics for a single operation."""
+
     operation_name: str
     duration_seconds: float
     start_time: datetime = field(default_factory=datetime.utcnow)
@@ -49,6 +50,7 @@ class OperationMetrics:
 @dataclass
 class CacheEntry:
     """Single cache entry with TTL and metadata."""
+
     key: str
     value: Any
     created_at: datetime = field(default_factory=datetime.utcnow)
@@ -104,11 +106,7 @@ class DecisionCache:
             if key in self.cache:
                 del self.cache[key]
 
-            self.cache[key] = CacheEntry(
-                key=key,
-                value=value,
-                ttl_seconds=self.ttl_seconds
-            )
+            self.cache[key] = CacheEntry(key=key, value=value, ttl_seconds=self.ttl_seconds)
 
             # Evict least recently used if over limit
             while len(self.cache) > self.max_size:
@@ -172,11 +170,7 @@ class AnalysisCache:
             if key in self.cache:
                 del self.cache[key]
 
-            self.cache[key] = CacheEntry(
-                key=key,
-                value=value,
-                ttl_seconds=self.ttl_seconds
-            )
+            self.cache[key] = CacheEntry(key=key, value=value, ttl_seconds=self.ttl_seconds)
 
             while len(self.cache) > self.max_size:
                 self.cache.popitem(last=False)
@@ -213,15 +207,12 @@ def _hash_args(args: Tuple[Any, ...], kwargs: Dict[str, Any]) -> str:
     """Create hash of function arguments."""
     try:
         # Convert args and kwargs to JSON-serializable format
-        serializable = {
-            "args": str(args),
-            "kwargs": str(sorted(kwargs.items()))
-        }
-        content = str(serializable).encode('utf-8')
+        serializable = {"args": str(args), "kwargs": str(sorted(kwargs.items()))}
+        content = str(serializable).encode("utf-8")
         return hashlib.md5(content).hexdigest()
     except Exception:
         # Fallback: use object ids if not serializable
-        return hashlib.md5(str(id(args)).encode('utf-8')).hexdigest()
+        return hashlib.md5(str(id(args)).encode("utf-8")).hexdigest()
 
 
 def memoize_decision(func: Callable) -> Callable:
@@ -336,7 +327,7 @@ class BatchOptimizer:
     def recommend_batch_size(self, task_count: int, available_resources: int = 6) -> int:
         """Recommend optimal batch size."""
         # Simple heuristic: batch size = sqrt(task_count) * resource_factor
-        base_size = max(1, int((task_count ** 0.5)))
+        base_size = max(1, int((task_count**0.5)))
         recommended = min(base_size * available_resources, task_count)
         return max(1, recommended)
 
@@ -435,10 +426,7 @@ class MetricsCollector:
                 "cache_hits": all_cache_hits,
                 "cache_hit_rate": (all_cache_hits / len(self.metrics) * 100),
                 "success_rate": (all_success / len(self.metrics) * 100),
-                "operations_by_type": {
-                    op_name: len(metrics)
-                    for op_name, metrics in ops_by_name.items()
-                },
+                "operations_by_type": {op_name: len(metrics) for op_name, metrics in ops_by_name.items()},
             }
 
     def clear(self) -> None:
@@ -453,14 +441,16 @@ class PerformanceManager:
     def __init__(self, config: PerformanceConfig):
         """Initialize performance manager."""
         self.config = config
-        self.decision_cache = DecisionCache(
-            max_size=config.cache_max_size,
-            ttl_seconds=config.cache_ttl_seconds
-        ) if config.cache_enabled else None
-        self.analysis_cache = AnalysisCache(
-            max_size=config.cache_max_size // 2,
-            ttl_seconds=config.cache_ttl_seconds
-        ) if config.cache_enabled else None
+        self.decision_cache = (
+            DecisionCache(max_size=config.cache_max_size, ttl_seconds=config.cache_ttl_seconds)
+            if config.cache_enabled
+            else None
+        )
+        self.analysis_cache = (
+            AnalysisCache(max_size=config.cache_max_size // 2, ttl_seconds=config.cache_ttl_seconds)
+            if config.cache_enabled
+            else None
+        )
         self.parallel_executor = ParallelExecutor() if config.enable_parallel_execution else None
         self.batch_optimizer = BatchOptimizer() if config.enable_batch_optimization else None
         self.metrics_collector = MetricsCollector(enabled=config.metrics_enabled)

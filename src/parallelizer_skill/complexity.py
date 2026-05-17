@@ -9,6 +9,7 @@ from parallelizer_skill.models import Task, TaskDependency, DependencyType
 
 class ComplexityLevel(str, Enum):
     """Complexity classification levels."""
+
     TRIVIAL = "trivial"
     SIMPLE = "simple"
     MODERATE = "moderate"
@@ -18,6 +19,7 @@ class ComplexityLevel(str, Enum):
 
 class FeasibilityRating(str, Enum):
     """Feasibility assessment."""
+
     HIGHLY_FEASIBLE = "highly_feasible"
     FEASIBLE = "feasible"
     CHALLENGING = "challenging"
@@ -28,6 +30,7 @@ class FeasibilityRating(str, Enum):
 @dataclass
 class ComplexityScore:
     """Complete complexity assessment."""
+
     task_id: str
     complexity_level: ComplexityLevel
     feasibility_rating: FeasibilityRating
@@ -151,9 +154,9 @@ class ComplexityScorer:
         incoming = len([d for d in dependencies if d.target_task_id == task_id])
         outgoing = len([d for d in dependencies if d.source_task_id == task_id])
 
-        # Count hard vs soft dependencies
-        hard_deps = len([d for d in dependencies if d.dependency_type == DependencyType.HARD])
-        soft_deps = len([d for d in dependencies if d.dependency_type == DependencyType.SOFT])
+        # Count hard vs soft dependencies (for future use in detailed analysis)
+        _hard_deps = len([d for d in dependencies if d.dependency_type == DependencyType.HARD])
+        _soft_deps = len([d for d in dependencies if d.dependency_type == DependencyType.SOFT])
 
         # More dependencies = lower score
         total_deps = incoming + outgoing

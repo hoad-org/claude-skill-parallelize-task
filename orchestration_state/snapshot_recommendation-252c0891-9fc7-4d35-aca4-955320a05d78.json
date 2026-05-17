@@ -1,0 +1,1 @@
+{"snapshot_id": "recommendation-252c0891-9fc7-4d35-aca4-955320a05d78", "timestamp": "2026-05-17T12:06:16.064696", "state_type": "recommendation", "source_id": "workflow-gpu-001", "data": {"strategy_type": "aggressive", "max_parallel_tasks": 16, "monitoring_intensity": "normal"}, "checksum": "721208eb634cb607c6761c2c1a49e989"}

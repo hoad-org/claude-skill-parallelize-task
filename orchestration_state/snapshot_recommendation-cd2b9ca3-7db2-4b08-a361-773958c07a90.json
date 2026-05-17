@@ -1,0 +1,1 @@
+{"snapshot_id": "recommendation-cd2b9ca3-7db2-4b08-a361-773958c07a90", "timestamp": "2026-05-17T12:06:20.404397", "state_type": "recommendation", "source_id": "workflow-reliability-001", "data": {"strategy_type": "conservative", "max_parallel_tasks": 4, "monitoring_intensity": "normal"}, "checksum": "c28c3ac495414fe41ac5f6223ebb47cd"}

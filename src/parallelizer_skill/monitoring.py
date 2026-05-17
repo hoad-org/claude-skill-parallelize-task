@@ -4,14 +4,12 @@ Provides metrics tracking, event logging, execution tracing, health monitoring,
 and alerting for the parallelize-task skill.
 """
 
-import json
 import threading
-import time
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Set
-from collections import OrderedDict, deque
+from typing import Any, Dict, List, Optional, Set
+from collections import deque
 
 
 # ============================================================================
@@ -408,20 +406,14 @@ class TraceCollector:
             if trace_id in self.traces:
                 trace = self.traces[trace_id]
                 trace.end_time = datetime.utcnow()
-                trace.duration_seconds = (
-                    trace.end_time - trace.start_time
-                ).total_seconds()
+                trace.duration_seconds = (trace.end_time - trace.start_time).total_seconds()
                 trace.status = status
 
-    def add_decision_point(
-        self, trace_id: str, decision: str, outcome: str
-    ) -> None:
+    def add_decision_point(self, trace_id: str, decision: str, outcome: str) -> None:
         """Record a decision point in the trace."""
         with self._lock:
             if trace_id in self.traces:
-                self.traces[trace_id].decision_points.append(
-                    {"decision": decision, "outcome": outcome}
-                )
+                self.traces[trace_id].decision_points.append({"decision": decision, "outcome": outcome})
 
     def add_execution_step(self, trace_id: str, step: str) -> None:
         """Add a step to the execution path."""
@@ -436,6 +428,7 @@ class TraceCollector:
 
     def get_trace_timeline(self, trace_id: str) -> List[ExecutionTrace]:
         """Get ordered timeline of trace and all children."""
+
         def collect_traces(tid: str) -> List[ExecutionTrace]:
             traces = [self.traces[tid]]
             for child_id in self.trace_hierarchy.get(tid, []):
@@ -451,20 +444,14 @@ class TraceCollector:
         """Remove traces older than specified duration. Returns count removed."""
         with self._lock:
             cutoff = datetime.utcnow() - timedelta(seconds=older_than_seconds)
-            to_delete = [
-                tid
-                for tid, trace in self.traces.items()
-                if trace.start_time < cutoff
-            ]
+            to_delete = [tid for tid, trace in self.traces.items() if trace.start_time < cutoff]
 
             for tid in to_delete:
                 del self.traces[tid]
 
             # Clean up hierarchy
             self.trace_hierarchy = {
-                parent: [
-                    child for child in children if child not in to_delete
-                ]
+                parent: [child for child in children if child not in to_delete]
                 for parent, children in self.trace_hierarchy.items()
                 if parent not in to_delete
             }
@@ -508,11 +495,7 @@ class HealthMonitor:
                 issues.append("resource_unavailable")
 
             if issues:
-                status = (
-                    HealthStatus.UNHEALTHY
-                    if len(issues) > 2
-                    else HealthStatus.DEGRADED
-                )
+                status = HealthStatus.UNHEALTHY if len(issues) > 2 else HealthStatus.DEGRADED
             else:
                 status = HealthStatus.HEALTHY
 
@@ -535,14 +518,10 @@ class HealthMonitor:
     def _update_status(self, new_status: HealthStatus) -> None:
         """Update health status and record transition."""
         if new_status != self.current_status:
-            self.status_history.append(
-                (self.current_status, new_status, datetime.utcnow())
-            )
+            self.status_history.append((self.current_status, new_status, datetime.utcnow()))
             self.current_status = new_status
 
-    def get_status_history(
-        self, limit: int = 100
-    ) -> List[tuple]:
+    def get_status_history(self, limit: int = 100) -> List[tuple]:
         """Get recent status transitions."""
         with self._lock:
             return self.status_history[-limit:]
@@ -580,9 +559,7 @@ class AlertManager:
         with self._lock:
             # Deduplication: don't create duplicate alerts within 60 seconds
             if alert_type in self._last_alert_time:
-                time_since_last = (
-                    datetime.utcnow() - self._last_alert_time[alert_type]
-                ).total_seconds()
+                time_since_last = (datetime.utcnow() - self._last_alert_time[alert_type]).total_seconds()
                 if time_since_last < 60:
                     return None
 
@@ -620,9 +597,7 @@ class AlertManager:
         with self._lock:
             return [a for a in self.alerts if a.alert_id in self.active_alerts]
 
-    def get_alert_history(
-        self, alert_type: Optional[AlertType] = None, limit: int = 1000
-    ) -> List[Alert]:
+    def get_alert_history(self, alert_type: Optional[AlertType] = None, limit: int = 1000) -> List[Alert]:
         """Get alert history, optionally filtered by type."""
         with self._lock:
             alerts = list(self.alerts)
@@ -692,9 +667,7 @@ class MonitoringManager:
                 return None
 
             metrics.end_time = datetime.utcnow()
-            metrics.total_duration_seconds = (
-                metrics.end_time - metrics.start_time
-            ).total_seconds()
+            metrics.total_duration_seconds = (metrics.end_time - metrics.start_time).total_seconds()
             metrics.success = success
             metrics.error_message = error_message
 
@@ -730,9 +703,7 @@ class MonitoringManager:
 
         return metrics
 
-    def end_phase(
-        self, workflow_id: str, phase_number: int, success: bool = True
-    ) -> Optional[PhaseMetrics]:
+    def end_phase(self, workflow_id: str, phase_number: int, success: bool = True) -> Optional[PhaseMetrics]:
         """Record phase completion."""
         if not self.enabled:
             return None
@@ -745,9 +716,7 @@ class MonitoringManager:
                 return None
 
             metrics.end_time = datetime.utcnow()
-            metrics.duration_seconds = (
-                metrics.end_time - metrics.start_time
-            ).total_seconds()
+            metrics.duration_seconds = (metrics.end_time - metrics.start_time).total_seconds()
 
         self.event_logger.log_event(
             EventType.PHASE_COMPLETED,
@@ -770,9 +739,7 @@ class MonitoringManager:
         if not self.enabled:
             return
 
-        event_type = (
-            EventType.TASK_COMPLETED if success else EventType.TASK_FAILED
-        )
+        event_type = EventType.TASK_COMPLETED if success else EventType.TASK_FAILED
         severity = Severity.INFO if success else Severity.WARNING
 
         self.event_logger.log_event(
@@ -797,9 +764,7 @@ class MonitoringManager:
         with self._lock:
             return self.workflow_metrics.get(workflow_id)
 
-    def get_phase_metrics(
-        self, workflow_id: str, phase_number: int
-    ) -> Optional[PhaseMetrics]:
+    def get_phase_metrics(self, workflow_id: str, phase_number: int) -> Optional[PhaseMetrics]:
         """Retrieve phase metrics."""
         phase_key = f"{workflow_id}:phase:{phase_number}"
         with self._lock:
@@ -813,9 +778,7 @@ class MonitoringManager:
                 return {}
 
             phases = [
-                self.phase_metrics[k].to_dict()
-                for k in self.phase_metrics
-                if k.startswith(f"{workflow_id}:phase:")
+                self.phase_metrics[k].to_dict() for k in self.phase_metrics if k.startswith(f"{workflow_id}:phase:")
             ]
 
         return {
@@ -833,11 +796,7 @@ class MonitoringManager:
 
         with self._lock:
             cutoff = datetime.utcnow() - timedelta(seconds=older_than_seconds)
-            old_workflows = [
-                wid
-                for wid, metrics in self.workflow_metrics.items()
-                if metrics.start_time < cutoff
-            ]
+            old_workflows = [wid for wid, metrics in self.workflow_metrics.items() if metrics.start_time < cutoff]
             for wid in old_workflows:
                 del self.workflow_metrics[wid]
             removed["workflows"] = len(old_workflows)

@@ -1,0 +1,1 @@
+{"snapshot_id": "recommendation-42ac65d6-a61e-40e2-9db2-193b2d4be4bb", "timestamp": "2026-05-17T12:20:48.819946", "state_type": "recommendation", "source_id": "workflow-cost-001", "data": {"strategy_type": "aggressive", "max_parallel_tasks": 4, "monitoring_intensity": "normal"}, "checksum": "44ea8adec79ac4a39840404c35653270"}

@@ -1,9 +1,7 @@
 """Unit tests for configuration system (4-level hierarchy)."""
 
 import pytest
-from parallelizer_skill.config import (
-    SkillConfig, ConfigLoader, get_config, reset_config
-)
+from parallelizer_skill.config import SkillConfig, ConfigLoader, get_config, reset_config
 
 
 @pytest.mark.unit
@@ -135,7 +133,7 @@ class TestConfigCaching:
         # Verify cache is empty before first call
         assert not hasattr(get_config, "_config")
 
-        config1 = get_config()
+        get_config()
         # Verify cache is populated after first call
         assert hasattr(get_config, "_config")
 
@@ -143,7 +141,7 @@ class TestConfigCaching:
         # Verify cache is cleared after reset
         assert not hasattr(get_config, "_config")
 
-        config2 = get_config()
+        get_config()
         # Verify cache is repopulated after new get_config call
         assert hasattr(get_config, "_config")
 

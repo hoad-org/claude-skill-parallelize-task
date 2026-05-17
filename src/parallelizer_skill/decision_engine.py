@@ -1,15 +1,16 @@
 """Decision Engine with Q1-Q6 decision trees for strategy recommendations (Phase 3)."""
 
 from enum import Enum
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
-from parallelizer_skill.models import Task, TaskDependency, ExecutionPlan
+from dataclasses import dataclass
+from typing import Dict, List, Optional
+from parallelizer_skill.models import Task, TaskDependency
 from parallelizer_skill.complexity import ComplexityScorer, ComplexityLevel, FeasibilityRating
 from parallelizer_skill.config import get_config
 
 
 class ParallelizationGoal(str, Enum):
     """Q1: Primary parallelization goal."""
+
     PERFORMANCE = "performance"  # Minimize execution time
     COST = "cost"  # Minimize resource consumption
     RELIABILITY = "reliability"  # Maximize success rate
@@ -17,6 +18,7 @@ class ParallelizationGoal(str, Enum):
 
 class TaskComplexityClass(str, Enum):
     """Q2: Task complexity classification."""
+
     SIMPLE = "simple"  # TRIVIAL, SIMPLE
     MODERATE = "moderate"  # MODERATE
     COMPLEX = "complex"  # COMPLEX, VERY_COMPLEX
@@ -24,6 +26,7 @@ class TaskComplexityClass(str, Enum):
 
 class ResourceConstraint(str, Enum):
     """Q3: Primary resource constraint."""
+
     CPU = "cpu"
     MEMORY = "memory"
     IO = "io"
@@ -33,6 +36,7 @@ class ResourceConstraint(str, Enum):
 
 class DependencyDensity(str, Enum):
     """Q4: Dependency structure."""
+
     SPARSE = "sparse"  # 0-1 deps per task
     MODERATE = "moderate"  # 2-3 deps per task
     DENSE = "dense"  # 4+ deps per task
@@ -40,6 +44,7 @@ class DependencyDensity(str, Enum):
 
 class FailureTolerance(str, Enum):
     """Q5: Failure handling strategy."""
+
     FAIL_FAST = "fail_fast"  # Stop on first failure
     RETRY = "retry"  # Retry with backoff
     FALLBACK = "fallback"  # Use fallback mechanisms
@@ -47,6 +52,7 @@ class FailureTolerance(str, Enum):
 
 class PriorityMetric(str, Enum):
     """Q6: Decision priority."""
+
     SPEED = "speed"  # Minimize latency
     COST = "cost"  # Minimize cost
     RELIABILITY = "reliability"  # Maximize availability
@@ -55,6 +61,7 @@ class PriorityMetric(str, Enum):
 @dataclass
 class DecisionContext:
     """Q1-Q6 decision context."""
+
     q1_goal: ParallelizationGoal
     q2_complexity: TaskComplexityClass
     q3_resource_constraint: ResourceConstraint
@@ -66,6 +73,7 @@ class DecisionContext:
 @dataclass
 class DecisionRecommendation:
     """Recommendation from decision engine."""
+
     strategy_type: str  # "aggressive", "balanced", "conservative"
     max_parallel_tasks: int
     recommended_batch_size: int
@@ -114,7 +122,9 @@ class DecisionEngine:
             return ResourceConstraint.NETWORK
         return ResourceConstraint.NONE
 
-    def answer_q4(self, dependencies: Optional[List[TaskDependency]], tasks: Optional[List[Task]] = None) -> DependencyDensity:
+    def answer_q4(
+        self, dependencies: Optional[List[TaskDependency]], tasks: Optional[List[Task]] = None
+    ) -> DependencyDensity:
         """Q4: What is dependency density?"""
         if not dependencies or not tasks:
             return DependencyDensity.SPARSE
@@ -126,7 +136,7 @@ class DecisionEngine:
             return DependencyDensity.SPARSE
 
         avg_deps_per_task = total_deps / task_count
-        
+
         if avg_deps_per_task < 1.5:
             return DependencyDensity.SPARSE
         elif avg_deps_per_task < 3.0:
@@ -146,7 +156,7 @@ class DecisionEngine:
         """Make parallelization recommendation based on Q1-Q6 answers."""
         # Decision tree logic
         strategy_type = self._determine_strategy(context, feasibility)
-        
+
         max_parallel = self._calculate_max_parallel(context)
         batch_size = self._calculate_batch_size(context, max_parallel)
         retry_count = self._calculate_retry_count(context)
@@ -277,9 +287,7 @@ class DecisionEngine:
         else:
             return "none"
 
-    def _generate_rationale(
-        self, context: DecisionContext, feasibility: FeasibilityRating, strategy_type: str
-    ) -> str:
+    def _generate_rationale(self, context: DecisionContext, feasibility: FeasibilityRating, strategy_type: str) -> str:
         """Generate human-readable rationale for recommendation."""
         rationale = f"Strategy: {strategy_type.upper()}. "
 

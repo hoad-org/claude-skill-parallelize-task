@@ -1,0 +1,99 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: parallelizer-api
+  namespace: default
+  labels:
+    app: parallelizer
+    component: api
+  annotations:
+    description: "Service for parallelizer API"
+spec:
+  type: ClusterIP
+  selector:
+    app: parallelizer
+    component: api
+  ports:
+    - name: api
+      port: 8000
+      targetPort: api
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: metrics
+      protocol: TCP
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: parallelizer-api-headless
+  namespace: default
+  labels:
+    app: parallelizer
+    component: api
+  annotations:
+    description: "Headless service for parallelizer API (for StatefulSet usage)"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: parallelizer
+    component: api
+  ports:
+    - name: api
+      port: 8000
+      targetPort: api
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: metrics
+      protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: parallelizer-api-loadbalancer
+  namespace: default
+  labels:
+    app: parallelizer
+    component: api
+  annotations:
+    description: "LoadBalancer service for external access to parallelizer API"
+spec:
+  type: LoadBalancer
+  selector:
+    app: parallelizer
+    component: api
+  ports:
+    - name: api
+      port: 80
+      targetPort: api
+      protocol: TCP
+      nodePort: 30000
+    - name: metrics
+      port: 9090
+      targetPort: metrics
+      protocol: TCP
+      nodePort: 30090
+  sessionAffinity: ClientIP
+
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: parallelizer-redis
+  namespace: default
+spec:
+  subsets:
+    - addresses:
+        - ip: 127.0.0.1
+      ports:
+        - port: 6379
+          name: redis

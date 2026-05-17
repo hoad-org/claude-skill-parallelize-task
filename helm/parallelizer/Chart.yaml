@@ -1,0 +1,33 @@
+apiVersion: v2
+name: parallelizer
+description: Claude Skill - Parallelizer Task - Intelligent task parallelization and workflow orchestration
+type: application
+version: 1.1.0
+appVersion: "1.1.0"
+home: https://github.com/anthropics/claude-skill-parallelize-task
+sources:
+  - https://github.com/anthropics/claude-skill-parallelize-task
+maintainers:
+  - name: Claude Code
+    email: claude@anthropic.com
+keywords:
+  - task-parallelization
+  - workflow-orchestration
+  - orchestration
+  - scheduling
+  - distributed-execution
+  - dag-analysis
+  - performance-optimization
+icon: https://avatars.githubusercontent.com/u/24292623?s=200&v=4
+dependencies:
+  - name: redis
+    version: "18.x.x"
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled
+  - name: prometheus
+    version: "25.x.x"
+    repository: https://prometheus-community.github.io/helm-charts
+    condition: prometheus.enabled
+annotations:
+  category: Integration
+  licenses: MIT

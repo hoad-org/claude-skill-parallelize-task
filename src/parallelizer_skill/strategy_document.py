@@ -5,13 +5,14 @@ from typing import Dict, List, Optional, Any
 from datetime import datetime
 from parallelizer_skill.models import Task, TaskDependency, ExecutionPlan
 from parallelizer_skill.complexity import ComplexityScore
-from parallelizer_skill.decision_engine import DecisionRecommendation, DecisionContext
+from parallelizer_skill.decision_engine import DecisionRecommendation
 from parallelizer_skill.config import get_config
 
 
 @dataclass
 class StrategyDocument:
     """A structured strategy document."""
+
     document_id: str
     title: str
     generated_at: datetime
@@ -43,22 +44,12 @@ class StrategyDocumentGenerator:
     ) -> StrategyDocument:
         """Generate a strategy document."""
         # Generate sections
-        executive_summary = self._generate_executive_summary(
-            title, decision_recommendation, len(tasks)
-        )
-        analysis_summary = self._generate_analysis_summary(
-            tasks, dependencies, complexity_scores, execution_plan
-        )
+        executive_summary = self._generate_executive_summary(title, decision_recommendation, len(tasks))
+        analysis_summary = self._generate_analysis_summary(tasks, dependencies, complexity_scores, execution_plan)
         recommendations = self._generate_recommendations_section(decision_recommendation)
-        implementation_plan = self._generate_implementation_plan(
-            tasks, dependencies, decision_recommendation
-        )
-        risk_assessment = self._generate_risk_assessment(
-            complexity_scores, dependencies, decision_recommendation
-        )
-        performance_projections = self._generate_performance_projections(
-            execution_plan, decision_recommendation
-        )
+        implementation_plan = self._generate_implementation_plan(tasks, dependencies, decision_recommendation)
+        risk_assessment = self._generate_risk_assessment(complexity_scores, dependencies, decision_recommendation)
+        performance_projections = self._generate_performance_projections(execution_plan, decision_recommendation)
 
         document = StrategyDocument(
             document_id=document_id,
@@ -75,9 +66,7 @@ class StrategyDocumentGenerator:
         self.documents[document_id] = document
         return document
 
-    def _generate_executive_summary(
-        self, title: str, recommendation: DecisionRecommendation, task_count: int
-    ) -> str:
+    def _generate_executive_summary(self, title: str, recommendation: DecisionRecommendation, task_count: int) -> str:
         """Generate executive summary."""
         summary = f"{title}\n\n"
         summary += f"Total Tasks: {task_count}\n"
@@ -97,12 +86,10 @@ class StrategyDocumentGenerator:
         """Generate analysis summary."""
         total_duration = sum(t.estimated_duration for t in tasks)
         critical_path = execution_plan.critical_path if execution_plan else []
-        
+
         # Find most complex task
         most_complex = max(
-            complexity_scores.values(),
-            key=lambda s: s.score if hasattr(s, 'score') else 0,
-            default=None
+            complexity_scores.values(), key=lambda s: s.score if hasattr(s, "score") else 0, default=None
         )
         most_complex_id = most_complex.task_id if most_complex else None
 
@@ -114,14 +101,14 @@ class StrategyDocumentGenerator:
             "critical_path_length": len(critical_path),
             "most_complex_task": most_complex_id,
             "parallel_phases": execution_plan.phases if execution_plan else [],
-            "potential_speedup": f"{execution_plan.serial_duration / execution_plan.parallel_duration:.1f}x"
-            if execution_plan and execution_plan.parallel_duration > 0
-            else "N/A",
+            "potential_speedup": (
+                f"{execution_plan.serial_duration / execution_plan.parallel_duration:.1f}x"
+                if execution_plan and execution_plan.parallel_duration > 0
+                else "N/A"
+            ),
         }
 
-    def _generate_recommendations_section(
-        self, recommendation: DecisionRecommendation
-    ) -> Dict[str, Any]:
+    def _generate_recommendations_section(self, recommendation: DecisionRecommendation) -> Dict[str, Any]:
         """Generate recommendations section."""
         return {
             "strategy_type": recommendation.strategy_type,
@@ -184,10 +171,7 @@ class StrategyDocumentGenerator:
     ) -> Dict[str, Any]:
         """Generate risk assessment."""
         # Count high-complexity tasks
-        high_complexity_count = sum(
-            1 for s in complexity_scores.values()
-            if hasattr(s, 'score') and s.score < 40
-        )
+        high_complexity_count = sum(1 for s in complexity_scores.values() if hasattr(s, "score") and s.score < 40)
 
         # Calculate dependency risk
         dependency_risk = "low" if len(dependencies) < 5 else "medium" if len(dependencies) < 10 else "high"
@@ -223,11 +207,17 @@ class StrategyDocumentGenerator:
         return {
             "projected_serial_duration": f"{execution_plan.serial_duration:.1f}s",
             "projected_parallel_duration": f"{execution_plan.parallel_duration:.1f}s",
-            "expected_speedup": f"{execution_plan.serial_duration / execution_plan.parallel_duration:.1f}x"
-            if execution_plan.parallel_duration > 0
-            else "∞",
+            "expected_speedup": (
+                f"{execution_plan.serial_duration / execution_plan.parallel_duration:.1f}x"
+                if execution_plan.parallel_duration > 0
+                else "∞"
+            ),
             "efficiency_gain": f"{execution_plan.efficiency_gain:.1f}%",
-            "resource_utilization": "high" if recommendation.max_parallel_tasks > 8 else "medium" if recommendation.max_parallel_tasks > 4 else "low",
+            "resource_utilization": (
+                "high"
+                if recommendation.max_parallel_tasks > 8
+                else "medium" if recommendation.max_parallel_tasks > 4 else "low"
+            ),
         }
 
     def get_document(self, document_id: str) -> Optional[StrategyDocument]:

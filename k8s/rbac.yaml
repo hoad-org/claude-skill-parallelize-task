@@ -1,0 +1,177 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: parallelizer
+  namespace: default
+  labels:
+    app: parallelizer
+  annotations:
+    description: "Service account for parallelizer API"
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: parallelizer
+  namespace: default
+  labels:
+    app: parallelizer
+  annotations:
+    description: "Role for parallelizer pod access to resources"
+rules:
+  # ConfigMap access
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+    resourceNames: ["parallelizer-config", "parallelizer-scripts"]
+
+  # Secret access
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]
+    resourceNames: ["parallelizer-secrets", "parallelizer-tls"]
+
+  # Pod access (for metrics collection)
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+
+  # Logs access
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: parallelizer
+  namespace: default
+  labels:
+    app: parallelizer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: parallelizer
+subjects:
+  - kind: ServiceAccount
+    name: parallelizer
+    namespace: default
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: parallelizer-monitoring
+  labels:
+    app: parallelizer
+  annotations:
+    description: "Cluster-wide role for metrics and monitoring"
+rules:
+  # Node metrics for performance monitoring
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list"]
+
+  # Pod metrics
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+
+  # Service metrics
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get", "list"]
+
+  # Deployment metrics
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list"]
+
+  # StatefulSet metrics
+  - apiGroups: ["apps"]
+    resources: ["statefulsets"]
+    verbs: ["get", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: parallelizer-monitoring
+  labels:
+    app: parallelizer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: parallelizer-monitoring
+subjects:
+  - kind: ServiceAccount
+    name: parallelizer
+    namespace: default
+
+---
+apiVersion: v1
+kind: NetworkPolicy
+metadata:
+  name: parallelizer-network-policy
+  namespace: default
+  labels:
+    app: parallelizer
+  annotations:
+    description: "Network policy for parallelizer pods"
+spec:
+  podSelector:
+    matchLabels:
+      app: parallelizer
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic from services
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: default
+      ports:
+        - protocol: TCP
+          port: 8000
+        - protocol: TCP
+          port: 9090
+    # Allow from Prometheus
+    - from:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - protocol: TCP
+          port: 9090
+  egress:
+    # Allow DNS
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow Redis
+    - to:
+        - podSelector:
+            matchLabels:
+              app: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    # Allow external HTTP/HTTPS
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443
+    # Allow PostgreSQL (if using external DB)
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 5432

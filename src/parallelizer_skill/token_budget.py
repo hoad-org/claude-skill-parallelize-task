@@ -9,6 +9,7 @@ from parallelizer_skill.config import get_config
 @dataclass
 class TokenAllocation:
     """Token allocation for a task."""
+
     task_id: str
     agent_id: str
     estimated_tokens: int

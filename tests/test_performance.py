@@ -3,10 +3,20 @@
 import pytest
 import time
 from datetime import datetime, timedelta
+from typing import Dict
+
 from parallelizer_skill.performance import (
-    PerformanceConfig, OperationMetrics, CacheEntry, DecisionCache, AnalysisCache,
-    memoize_decision, memoize_analysis, memoize_planning,
-    ParallelExecutor, BatchOptimizer, MetricsCollector, PerformanceManager
+    PerformanceConfig,
+    CacheEntry,
+    DecisionCache,
+    AnalysisCache,
+    memoize_decision,
+    memoize_analysis,
+    memoize_planning,
+    ParallelExecutor,
+    BatchOptimizer,
+    MetricsCollector,
+    PerformanceManager,
 )
 
 
@@ -230,6 +240,7 @@ class TestMemoizeDecorators:
 
     def test_memoize_decorator_cache_access(self):
         """Test accessing cache from memoized function."""
+
         @memoize_decision
         def test_func(x: int) -> int:
             return x * 2
@@ -456,11 +467,7 @@ class TestPerformanceManager:
 
     def test_performance_manager_get_stats(self):
         """Test getting stats from manager."""
-        config = PerformanceConfig(
-            cache_enabled=True,
-            metrics_enabled=True,
-            enable_batch_optimization=True
-        )
+        config = PerformanceConfig(cache_enabled=True, metrics_enabled=True, enable_batch_optimization=True)
         manager = PerformanceManager(config)
         manager.metrics_collector.record_operation("decision", 0.5)
         stats = manager.get_stats()
@@ -601,7 +608,3 @@ class TestPerformanceImprovement:
             recommended = optimizer.recommend_batch_size(task_count, 6)
             assert 0 < recommended <= task_count
             assert recommended >= 1
-
-
-# Import Dict for type hints
-from typing import Dict

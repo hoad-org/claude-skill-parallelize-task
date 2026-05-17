@@ -3,8 +3,7 @@
 import tempfile
 import json
 from pathlib import Path
-from typing import List, Dict, Tuple
-from datetime import datetime
+from typing import List
 
 import pytest
 
@@ -13,12 +12,8 @@ from parallelizer_skill.models import (
     TaskDependency,
     DependencyType,
     TaskPriority,
-    WorkflowAnalysis,
-    ExecutionPlan,
-    ExecutionPhase,
-    TaskGroup,
 )
-from parallelizer_skill.decision_engine import DecisionRecommendation, ParallelizationGoal
+from parallelizer_skill.decision_engine import DecisionRecommendation
 from parallelizer_skill.config import reset_config
 
 
@@ -116,7 +111,9 @@ def simple_dependencies() -> List[TaskDependency]:
 def complex_tasks() -> List[Task]:
     """Create 10 complex tasks with various characteristics."""
     return [
-        Task(id="a1", name="Data Ingestion", estimated_duration=5.0, parallelizable=False, priority=TaskPriority.CRITICAL),
+        Task(
+            id="a1", name="Data Ingestion", estimated_duration=5.0, parallelizable=False, priority=TaskPriority.CRITICAL
+        ),
         Task(id="a2", name="Validation", estimated_duration=3.0, parallelizable=False, priority=TaskPriority.HIGH),
         Task(
             id="b1",
@@ -280,23 +277,43 @@ def data_pipeline_dependencies(data_pipeline_tasks) -> List[TaskDependency]:
 
     # Validation depends on ingestion
     for i in range(1, 5):
-        deps.append(TaskDependency(source_task_id="ingest_1", target_task_id=f"validate_{i}", dependency_type=DependencyType.HARD))
+        deps.append(
+            TaskDependency(
+                source_task_id="ingest_1", target_task_id=f"validate_{i}", dependency_type=DependencyType.HARD
+            )
+        )
 
     # Transformation depends on validation
     for i in range(1, 7):
         # Each transform depends on at least one validation
         validate_idx = ((i - 1) % 4) + 1
-        deps.append(TaskDependency(source_task_id=f"validate_{validate_idx}", target_task_id=f"transform_{i}", dependency_type=DependencyType.HARD))
+        deps.append(
+            TaskDependency(
+                source_task_id=f"validate_{validate_idx}",
+                target_task_id=f"transform_{i}",
+                dependency_type=DependencyType.HARD,
+            )
+        )
 
     # Enrichment depends on transformation
     for i in range(1, 5):
         transform_idx = ((i - 1) % 6) + 1
-        deps.append(TaskDependency(source_task_id=f"transform_{transform_idx}", target_task_id=f"enrich_{i}", dependency_type=DependencyType.HARD))
+        deps.append(
+            TaskDependency(
+                source_task_id=f"transform_{transform_idx}",
+                target_task_id=f"enrich_{i}",
+                dependency_type=DependencyType.HARD,
+            )
+        )
 
     # Output depends on enrichment
     for i in range(1, 4):
         enrich_idx = ((i - 1) % 4) + 1
-        deps.append(TaskDependency(source_task_id=f"enrich_{enrich_idx}", target_task_id=f"output_{i}", dependency_type=DependencyType.HARD))
+        deps.append(
+            TaskDependency(
+                source_task_id=f"enrich_{enrich_idx}", target_task_id=f"output_{i}", dependency_type=DependencyType.HARD
+            )
+        )
 
     return deps
 
@@ -305,9 +322,21 @@ def data_pipeline_dependencies(data_pipeline_tasks) -> List[TaskDependency]:
 def microservices_deployment_tasks() -> List[Task]:
     """Create 15 tasks for microservices deployment."""
     services = [
-        "auth", "api", "database", "cache", "queue",
-        "worker1", "worker2", "worker3", "analytics", "scheduler",
-        "gateway", "config", "monitoring", "logging", "backup",
+        "auth",
+        "api",
+        "database",
+        "cache",
+        "queue",
+        "worker1",
+        "worker2",
+        "worker3",
+        "analytics",
+        "scheduler",
+        "gateway",
+        "config",
+        "monitoring",
+        "logging",
+        "backup",
     ]
 
     tasks = []
@@ -346,18 +375,42 @@ def microservices_deployment_dependencies(microservices_deployment_tasks) -> Lis
 
     # Worker dependencies
     for i in range(1, 4):
-        deps.append(TaskDependency(source_task_id="deploy_queue", target_task_id=f"deploy_worker{i}", dependency_type=DependencyType.HARD))
+        deps.append(
+            TaskDependency(
+                source_task_id="deploy_queue", target_task_id=f"deploy_worker{i}", dependency_type=DependencyType.HARD
+            )
+        )
 
     # Analytics and scheduler after workers
-    deps.append(TaskDependency(source_task_id="deploy_worker1", target_task_id="deploy_analytics", dependency_type=DependencyType.SOFT))
-    deps.append(TaskDependency(source_task_id="deploy_worker1", target_task_id="deploy_scheduler", dependency_type=DependencyType.SOFT))
+    deps.append(
+        TaskDependency(
+            source_task_id="deploy_worker1", target_task_id="deploy_analytics", dependency_type=DependencyType.SOFT
+        )
+    )
+    deps.append(
+        TaskDependency(
+            source_task_id="deploy_worker1", target_task_id="deploy_scheduler", dependency_type=DependencyType.SOFT
+        )
+    )
 
     # Monitoring and logging can run in parallel with deployment
-    deps.append(TaskDependency(source_task_id="deploy_api", target_task_id="deploy_monitoring", dependency_type=DependencyType.SOFT))
-    deps.append(TaskDependency(source_task_id="deploy_api", target_task_id="deploy_logging", dependency_type=DependencyType.SOFT))
+    deps.append(
+        TaskDependency(
+            source_task_id="deploy_api", target_task_id="deploy_monitoring", dependency_type=DependencyType.SOFT
+        )
+    )
+    deps.append(
+        TaskDependency(
+            source_task_id="deploy_api", target_task_id="deploy_logging", dependency_type=DependencyType.SOFT
+        )
+    )
 
     # Backup after all services up
-    deps.append(TaskDependency(source_task_id="deploy_database", target_task_id="deploy_backup", dependency_type=DependencyType.HARD))
+    deps.append(
+        TaskDependency(
+            source_task_id="deploy_database", target_task_id="deploy_backup", dependency_type=DependencyType.HARD
+        )
+    )
 
     return deps
 

@@ -9,6 +9,7 @@ from parallelizer_skill.config import get_config
 
 class EscalationLevel(str, Enum):
     """Escalation severity levels."""
+
     INFO = "info"
     WARNING = "warning"
     CRITICAL = "critical"
@@ -17,6 +18,7 @@ class EscalationLevel(str, Enum):
 
 class EscalationAction(str, Enum):
     """Actions to take on escalation."""
+
     RETRY = "retry"
     REASSIGN = "reassign"
     DECOMPOSE = "decompose"
@@ -27,6 +29,7 @@ class EscalationAction(str, Enum):
 @dataclass
 class EscalationEvent:
     """Record of an escalation event."""
+
     escalation_id: str
     agent_id: str
     task_id: str
@@ -41,6 +44,7 @@ class EscalationEvent:
 @dataclass
 class EscalationPolicy:
     """Policy for handling escalations."""
+
     level: EscalationLevel
     max_retries: int = 3
     retry_delay_seconds: int = 5
@@ -175,7 +179,7 @@ class EscalationManager:
         policy = self.policies[event.level]
         retry_count = self.recovery_attempts.get(escalation_id, 0)
 
-        delay = policy.retry_delay_seconds * (policy.backoff_multiplier ** retry_count)
+        delay = policy.retry_delay_seconds * (policy.backoff_multiplier**retry_count)
         return min(int(delay), policy.max_backoff_seconds)
 
     def get_agent_failures(self, agent_id: str) -> List[EscalationEvent]:
@@ -189,10 +193,7 @@ class EscalationManager:
         return {
             "agent_id": agent_id,
             "total_failures": len(events),
-            "by_level": {
-                level.value: len([e for e in events if e.level == level])
-                for level in EscalationLevel
-            },
+            "by_level": {level.value: len([e for e in events if e.level == level]) for level in EscalationLevel},
             "last_failure": events[-1].timestamp if events else None,
             "most_common_cause": self._most_common_cause(events),
         }

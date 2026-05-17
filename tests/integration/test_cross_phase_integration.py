@@ -38,10 +38,14 @@ class TestCrossPhaseIntegration:
 
         analysis = orchestrator.analyze_workflow(workflow_id, complex_tasks, complex_dependencies)
 
-        conservative_decision = orchestrator.generate_strategy(analysis, parallelization_goal=ParallelizationGoal.RELIABILITY)
+        conservative_decision = orchestrator.generate_strategy(
+            analysis, parallelization_goal=ParallelizationGoal.RELIABILITY
+        )
         conservative_plan = orchestrator.plan_execution(complex_tasks, complex_dependencies, conservative_decision)
 
-        aggressive_decision = orchestrator.generate_strategy(analysis, parallelization_goal=ParallelizationGoal.PERFORMANCE)
+        aggressive_decision = orchestrator.generate_strategy(
+            analysis, parallelization_goal=ParallelizationGoal.PERFORMANCE
+        )
         aggressive_plan = orchestrator.plan_execution(complex_tasks, complex_dependencies, aggressive_decision)
 
         assert conservative_plan.total_tasks == aggressive_plan.total_tasks
@@ -149,11 +153,11 @@ class TestCrossPhaseIntegration:
         deps = []
         for i in range(1, 50):
             if i % 5 == 0:
-                deps.append(TaskDependency(
-                    source_task_id=f"t{i}",
-                    target_task_id=f"t{i+1}",
-                    dependency_type=DependencyType.HARD
-                ))
+                deps.append(
+                    TaskDependency(
+                        source_task_id=f"t{i}", target_task_id=f"t{i+1}", dependency_type=DependencyType.HARD
+                    )
+                )
 
         workflow_id = "workflow-high-load-001"
 

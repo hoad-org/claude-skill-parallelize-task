@@ -1,0 +1,1 @@
+{"snapshot_id": "result-exec-b9446f86-488e-4acc-9a9a-7a89538343be", "timestamp": "2026-05-17T12:41:45.897565", "state_type": "execution_result", "source_id": "workflow-complex-001", "data": {"execution_id": "exec-b9446f86-488e-4acc-9a9a-7a89538343be", "status": "completed", "tasks_completed": 10, "efficiency": 99.99591025641024}, "checksum": "0b2b9100b894013e295d99c3114be21c"}

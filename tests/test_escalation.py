@@ -1,9 +1,7 @@
 """Unit tests for escalation management (Phase 2)."""
 
 import pytest
-from parallelizer_skill.escalation import (
-    EscalationManager, EscalationLevel, EscalationAction, EscalationEvent
-)
+from parallelizer_skill.escalation import EscalationManager, EscalationLevel, EscalationAction, EscalationEvent
 from parallelizer_skill.config import reset_config
 
 
@@ -188,6 +186,7 @@ class TestEscalationManager:
 
     def test_register_handler(self, manager):
         """Test registering escalation handler."""
+
         def my_handler(event):
             return "handled"
 

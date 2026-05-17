@@ -9,6 +9,7 @@ from parallelizer_skill.config import get_config
 
 class GatePolicy(str, Enum):
     """Stage gate policies."""
+
     ALL_PASS = "all_pass"  # All tasks must succeed
     ALL_COMPLETE = "all_complete"  # All tasks must finish (pass or fail)
     MAJORITY = "majority"  # 80% of tasks must pass
@@ -17,6 +18,7 @@ class GatePolicy(str, Enum):
 @dataclass
 class StageTask:
     """Task in a stage."""
+
     task_id: str
     agent_id: Optional[str] = None
     status: str = "pending"  # pending, running, complete, failed
@@ -26,6 +28,7 @@ class StageTask:
 @dataclass
 class Stage:
     """Execution stage with tasks and gate policy."""
+
     stage_number: int
     name: str
     tasks: List[StageTask] = field(default_factory=list)
@@ -64,7 +67,9 @@ class StageOrchestrator:
         self.stage_order: List[int] = []
         self.current_stage: int = -1
 
-    def add_stage(self, stage_number: int, name: str, tasks: List[str], gate_policy: GatePolicy = GatePolicy.ALL_PASS) -> None:
+    def add_stage(
+        self, stage_number: int, name: str, tasks: List[str], gate_policy: GatePolicy = GatePolicy.ALL_PASS
+    ) -> None:
         """Add a stage with tasks."""
         if stage_number in self.stages:
             raise ValueError(f"Stage {stage_number} already exists")
@@ -94,9 +99,7 @@ class StageOrchestrator:
             prior_stage = self.stages[prior_stage_num]
 
             if not prior_stage.is_complete():
-                raise RuntimeError(
-                    f"Cannot start stage {stage_number}: prior stage {prior_stage_num} not complete"
-                )
+                raise RuntimeError(f"Cannot start stage {stage_number}: prior stage {prior_stage_num} not complete")
 
             if not prior_stage.is_passed():
                 raise RuntimeError(
@@ -107,7 +110,9 @@ class StageOrchestrator:
         self.current_stage = stage_number
         stage.started_at = datetime.utcnow()
 
-    def update_task_status(self, stage_number: int, task_id: str, agent_id: str, status: str, error: Optional[str] = None) -> None:
+    def update_task_status(
+        self, stage_number: int, task_id: str, agent_id: str, status: str, error: Optional[str] = None
+    ) -> None:
         """Update task status in a stage."""
         if stage_number not in self.stages:
             raise ValueError(f"Unknown stage: {stage_number}")
@@ -178,10 +183,7 @@ class StageOrchestrator:
         return {
             "current_stage": self.current_stage,
             "total_stages": len(self.stages),
-            "stages": {
-                num: self.get_stage_status(num)
-                for num in self.stage_order
-            }
+            "stages": {num: self.get_stage_status(num) for num in self.stage_order},
         }
 
     def reset(self) -> None:

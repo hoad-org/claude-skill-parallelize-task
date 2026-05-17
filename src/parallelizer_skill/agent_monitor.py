@@ -9,6 +9,7 @@ from parallelizer_skill.config import get_config
 
 class AgentState(str, Enum):
     """Agent lifecycle states."""
+
     PENDING = "pending"
     SPAWNED = "spawned"
     RUNNING = "running"
@@ -21,6 +22,7 @@ class AgentState(str, Enum):
 @dataclass
 class AgentHeartbeat:
     """Heartbeat from a running agent."""
+
     agent_id: str
     task_id: str
     status: AgentState
@@ -32,6 +34,7 @@ class AgentHeartbeat:
 @dataclass
 class AgentStatus:
     """Track state and health of a single agent."""
+
     agent_id: str
     task_id: str
     state: AgentState = AgentState.PENDING
@@ -129,15 +132,13 @@ class AgentMonitor:
 
     def get_running_agents(self) -> List[str]:
         """Get list of currently running agent IDs."""
-        return [
-            agent_id for agent_id, status in self.agents.items()
-            if status.state == AgentState.RUNNING
-        ]
+        return [agent_id for agent_id, status in self.agents.items() if status.state == AgentState.RUNNING]
 
     def get_failed_agents(self) -> List[str]:
         """Get list of failed/crashed/timeout agent IDs."""
         return [
-            agent_id for agent_id, status in self.agents.items()
+            agent_id
+            for agent_id, status in self.agents.items()
             if status.state in (AgentState.FAILED, AgentState.CRASHED, AgentState.TIMEOUT)
         ]
 
