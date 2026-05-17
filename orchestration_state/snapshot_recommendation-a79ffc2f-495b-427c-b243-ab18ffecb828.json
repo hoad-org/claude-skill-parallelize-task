@@ -1,0 +1,1 @@
+{"snapshot_id": "recommendation-a79ffc2f-495b-427c-b243-ab18ffecb828", "timestamp": "2026-05-17T11:56:56.671451", "state_type": "recommendation", "source_id": "workflow-persist-001", "data": {"strategy_type": "conservative", "max_parallel_tasks": 4, "monitoring_intensity": "normal"}, "checksum": "c28c3ac495414fe41ac5f6223ebb47cd"}

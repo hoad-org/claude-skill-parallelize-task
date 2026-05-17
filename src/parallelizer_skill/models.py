@@ -2,6 +2,7 @@
 
 from enum import Enum
 from typing import Optional, List, Dict, Any
+from datetime import datetime
 from pydantic import BaseModel, Field
 
 
@@ -104,6 +105,63 @@ class ExecutionPlan(BaseModel):
     resource_conflicts: List[str] = Field(default_factory=list, description="Identified resource conflicts")
     safety_issues: List[str] = Field(default_factory=list, description="Safety warnings/issues")
     optimization_notes: List[str] = Field(default_factory=list, description="Notes on optimization strategy")
+
+    class Config:
+        use_enum_values = False
+
+
+class ExecutionStatus(str, Enum):
+    """Status of workflow execution."""
+
+    PENDING = "pending"
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    ABORTED = "aborted"
+    RECOVERED = "recovered"
+
+
+class WorkflowAnalysis(BaseModel):
+    """Analysis of a workflow's parallelization potential."""
+
+    analysis_id: str = Field(..., description="Unique analysis identifier")
+    workflow_id: str = Field(..., description="Workflow identifier")
+    total_tasks: int = Field(..., description="Total number of tasks in workflow")
+    total_dependencies: int = Field(..., description="Total number of dependencies")
+    complexity_scores: Dict[str, float] = Field(..., description="Complexity scores per task (0-100)")
+    feasibility_ratings: Dict[str, str] = Field(..., description="Feasibility ratings per task")
+    critical_path: List[str] = Field(..., description="Task IDs on critical path")
+    critical_path_duration: float = Field(..., description="Estimated critical path duration")
+    total_serial_duration: float = Field(..., description="Total duration if all tasks run serially")
+    parallelizable_tasks: List[str] = Field(default_factory=list, description="Tasks that can be parallelized")
+    sequential_bottlenecks: List[str] = Field(default_factory=list, description="Tasks creating sequential bottlenecks")
+    resource_conflicts: List[str] = Field(default_factory=list, description="Identified resource conflicts")
+    warnings: List[str] = Field(default_factory=list, description="Analysis warnings")
+    analysis_timestamp: datetime = Field(default_factory=datetime.utcnow, description="When analysis was performed")
+
+    class Config:
+        use_enum_values = False
+
+
+class ExecutionResult(BaseModel):
+    """Result of workflow execution."""
+
+    execution_id: str = Field(..., description="Unique execution identifier")
+    workflow_id: str = Field(..., description="Workflow being executed")
+    status: ExecutionStatus = Field(..., description="Execution status")
+    start_time: datetime = Field(..., description="When execution started")
+    end_time: Optional[datetime] = Field(None, description="When execution completed")
+    duration_seconds: float = Field(0.0, description="Total execution duration")
+    tasks_completed: int = Field(0, description="Number of completed tasks")
+    tasks_failed: int = Field(0, description="Number of failed tasks")
+    tasks_skipped: int = Field(0, description="Number of skipped tasks")
+    phases_executed: int = Field(0, description="Number of execution phases completed")
+    total_phases: int = Field(0, description="Total number of phases in plan")
+    efficiency_achieved: float = Field(0.0, description="Actual efficiency gain achieved (0-100)")
+    recovery_events: int = Field(0, description="Number of recovery events during execution")
+    escalation_events: int = Field(0, description="Number of escalation events")
+    error_message: Optional[str] = Field(None, description="Error message if execution failed")
+    metrics: Dict[str, Any] = Field(default_factory=dict, description="Execution metrics")
 
     class Config:
         use_enum_values = False

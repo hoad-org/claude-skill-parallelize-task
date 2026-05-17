@@ -1,0 +1,1 @@
+{"snapshot_id": "recommendation-9b690872-53a5-4a09-ba85-5cb541d2e26d", "timestamp": "2026-05-17T11:57:28.399758", "state_type": "recommendation", "source_id": "workflow-decision-plan-001", "data": {"strategy_type": "conservative", "max_parallel_tasks": 4, "monitoring_intensity": "normal"}, "checksum": "c28c3ac495414fe41ac5f6223ebb47cd"}

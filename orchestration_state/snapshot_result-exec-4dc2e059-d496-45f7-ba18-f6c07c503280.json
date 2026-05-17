@@ -1,0 +1,1 @@
+{"snapshot_id": "result-exec-4dc2e059-d496-45f7-ba18-f6c07c503280", "timestamp": "2026-05-17T12:03:31.604033", "state_type": "execution_result", "source_id": "workflow-gpu-001", "data": {"execution_id": "exec-4dc2e059-d496-45f7-ba18-f6c07c503280", "status": "completed", "tasks_completed": 6, "efficiency": 99.99797333333333}, "checksum": "84ed3aa364c55813975f61bbe3af4433"}

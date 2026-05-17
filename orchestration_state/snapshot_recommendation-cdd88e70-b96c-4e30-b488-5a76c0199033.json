@@ -1,0 +1,1 @@
+{"snapshot_id": "recommendation-cdd88e70-b96c-4e30-b488-5a76c0199033", "timestamp": "2026-05-17T11:58:24.074014", "state_type": "recommendation", "source_id": "workflow-consistency-001", "data": {"strategy_type": "conservative", "max_parallel_tasks": 4, "monitoring_intensity": "normal"}, "checksum": "c28c3ac495414fe41ac5f6223ebb47cd"}

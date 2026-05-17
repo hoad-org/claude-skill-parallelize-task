@@ -1,0 +1,1 @@
+{"snapshot_id": "recommendation-1eb695ed-8e70-4409-aa1c-661c771d91c1", "timestamp": "2026-05-17T11:58:28.091796", "state_type": "recommendation", "source_id": "workflow-high-load-001", "data": {"strategy_type": "conservative", "max_parallel_tasks": 4, "monitoring_intensity": "normal"}, "checksum": "c28c3ac495414fe41ac5f6223ebb47cd"}

@@ -1,0 +1,1 @@
+{"snapshot_id": "result-exec-1d2aa0f1-96d7-45ab-9ff0-7d0389bc4e1e", "timestamp": "2026-05-17T11:57:13.533285", "state_type": "execution_result", "source_id": "workflow-reliability-001", "data": {"execution_id": "exec-1d2aa0f1-96d7-45ab-9ff0-7d0389bc4e1e", "status": "completed", "tasks_completed": 10, "efficiency": 99.9987717948718}, "checksum": "e4dc1d81582a1732f478deb19e0164b0"}

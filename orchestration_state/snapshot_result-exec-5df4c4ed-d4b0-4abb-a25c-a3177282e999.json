@@ -1,0 +1,1 @@
+{"snapshot_id": "result-exec-5df4c4ed-d4b0-4abb-a25c-a3177282e999", "timestamp": "2026-05-17T11:07:44.909290", "state_type": "execution_result", "source_id": "wf-test-13", "data": {"execution_id": "exec-5df4c4ed-d4b0-4abb-a25c-a3177282e999", "status": "completed", "tasks_completed": 4, "efficiency": 99.997775}, "checksum": "0e3dd35a90bf88fe5a8cb6c4e2924ee1"}

@@ -1,0 +1,1 @@
+{"snapshot_id": "recommendation-332739d7-16fc-4179-8d65-52755eb6fead", "timestamp": "2026-05-17T11:57:28.398384", "state_type": "recommendation", "source_id": "workflow-feedback-001", "data": {"strategy_type": "conservative", "max_parallel_tasks": 4, "monitoring_intensity": "normal"}, "checksum": "c28c3ac495414fe41ac5f6223ebb47cd"}

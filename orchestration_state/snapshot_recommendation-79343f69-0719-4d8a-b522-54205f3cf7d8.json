@@ -1,0 +1,1 @@
+{"snapshot_id": "recommendation-79343f69-0719-4d8a-b522-54205f3cf7d8", "timestamp": "2026-05-17T11:58:28.325268", "state_type": "recommendation", "source_id": "wf-test-7", "data": {"strategy_type": "aggressive", "max_parallel_tasks": 4, "monitoring_intensity": "normal"}, "checksum": "44ea8adec79ac4a39840404c35653270"}

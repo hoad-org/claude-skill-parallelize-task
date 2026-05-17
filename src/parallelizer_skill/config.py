@@ -16,6 +16,7 @@ class OrchestrationConfig:
     per_task_timeout_minutes: int = 15
     heartbeat_interval_seconds: int = 5
     heartbeat_timeout_seconds: int = 30
+    state_dir: str = "orchestration_state"
 
 
 @dataclass
