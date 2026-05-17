@@ -2,6 +2,14 @@
 
 **Welcome to the intelligent task parallelization skill!** This document is your starting point for any Claude session working on this repository.
 
+⚠️ **PACKAGE DISTRIBUTION**: This skill is published to the **internal Hoad Python packages repository** only. Installation:
+```bash
+pip install --index-url https://hoad-org.github.io/python-packages claude-skill-parallelize-task
+```
+We do NOT use PyPI for this skill.
+
+---
+
 ## 🚀 Quick Start (5 minutes)
 
 1. **Read this file** (you're here!)
